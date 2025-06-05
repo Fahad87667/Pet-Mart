@@ -1,67 +1,48 @@
-# Online Pet Shop - Spring Boot Project
+# Pet-Mart
 
-Welcome to the Online Pet Shop, a Spring Boot project where users can explore and purchase pets.
+A full-stack e-commerce platform for pet supplies and services.
 
-## Features
+## Project Structure
 
-### Guest Users
-- Can visit the website.
-- View available pets and their prices.
+The project is organized into two main components:
 
-Home Screen :
-  ![Screenshot 2023-11-21 181353](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/40e6a181-dd6b-4b66-a7d0-9ac848f07fb5)
+### Backend
+- Built with Java Spring Boot
+- Maven for dependency management
+- RESTful API architecture
 
-Pets' List :
-![Screenshot 2023-11-21 181525](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/43a25445-87c9-463b-ba33-7c63c5484176)
-
-Signup/Login page :
-![Screenshot 2023-11-21 181610](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/eaeb37b8-4485-4162-9ecf-0f0e5525d011)
-
-WishList : 
-![Screenshot 2023-11-21 181859](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/d6c07142-b438-4b0c-8932-b09411dd7da4)
-
-Order Confirmation :
-![Screenshot 2023-11-21 182033](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/b7fd7d30-0ade-4928-9cf7-1bca82340b04)
-![Screenshot 2023-11-21 182042](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/ebfb03a0-838d-4a65-8921-b646ccabb881)
-
-
-### Registered Users
-- Register and log in.
-- View and purchase pets.
-- Add pets to the wishlist.
-- Proceed to buy from the wishlist.
-- Generate a token upon finalizing the order.
-
-### Admin Users
-- Perform CRUD operations on pets.
-
-  Admin Panel : 
-![Screenshot 2023-11-21 182121](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/72286f61-72ba-42cc-b09c-c502eacc3481)
-
-Edit Product :
-![Screenshot 2023-11-21 182158](https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT/assets/107194145/f55f771a-88b5-482c-8f55-69fc8563155c)
-
-
-## Wishlist
-- Displays the grand total of selected pets.
-- Proceed to buy to finalize the order.
-- Generates a token for the order.
-
-## Technologies Used
-- Spring Boot
-- Hibernate
-- Thymeleaf
+### Frontend
+- Modern web application
+- Located in the `frontend` directory
 
 ## Getting Started
 
 ### Prerequisites
-- Java (JDK 8 or higher)
+- Java Development Kit (JDK)
+- Node.js and npm
 - Maven
 
-### Clone the Repository
-```bash
-  git clone https://github.com/Daxrajsinh/Online-Pet-Store_SPRING-BOOT.git
-  cd online-pet-shop
-```
-### Run the Project.
-- Visit http://localhost:8080 in your browser.
+### Backend Setup
+1. Navigate to the project root directory
+2. Run `mvn clean install` to install dependencies
+3. Start the backend server using `mvn spring-boot:run`
+
+### Frontend Setup
+1. Navigate to the `frontend` directory
+2. Run `npm install` to install dependencies
+3. Start the development server
+
+## Development
+
+The project uses:
+- Maven for backend dependency management
+- npm for frontend package management
+- Git for version control
+
+## Running the Application
+
+You can use the provided `run.bat` script to start the application, or run the backend and frontend separately as described in the setup instructions.
+
+## License
+
+This project is proprietary and confidential.
