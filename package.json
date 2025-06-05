@@ -1,7 +1,7 @@
 {
   "name": "pet-mart",
   "version": "1.0.0",
-  "description": "Pet Mart Full Stack Application",
+  "description": "Pet Mart is a full stack application that allows users to browse and adopt pets.",
   "scripts": {
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "backend": "mvnw.cmd spring-boot:run",
