@@ -40,17 +40,25 @@ function ProductCard({ product, onAddToCartSuccess, isAddedToCart, isAdmin }) {
     try {
       if (isAddedToCart) {
         await cartService.removeFromCart(product.code);
-        toast.success("Removed from cart successfully!");
+        toast.error("Removed from cart!", {
+          style: {
+            background: "#dc3545",
+            color: "white",
+          },
+        });
       } else {
-        const updatedCart = await cartService.addToCart(product.code, 1);
-        if (onAddToCartSuccess) {
-          onAddToCartSuccess(updatedCart);
-        }
+        await cartService.addToCart(product.code, 1);
         toast.success("Added to cart!");
-        navigate("/cart");
+      }
+      // Toggle the cart state after successful operation
+      if (onAddToCartSuccess) {
+        const updatedCart = await cartService.getCart();
+        onAddToCartSuccess(updatedCart);
       }
     } catch (err) {
-      toast.error(isAddedToCart ? "Failed to remove from cart" : "Failed to add to cart");
+      toast.error(
+        isAddedToCart ? "Failed to remove from cart" : "Failed to add to cart"
+      );
     } finally {
       setIsAddingOrRemoving(false);
     }
