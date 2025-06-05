@@ -68,15 +68,15 @@ function Cart({ onAddToCartSuccess }) {
       if (onAddToCartSuccess) {
         onAddToCartSuccess(updatedCart);
       }
-      toast.success("Item removed from cart!");
+      toast.success("Pet removed from adoption list!");
     } catch (err) {
       console.error("Error removing item:", err);
       if (err.message === "AUTHENTICATION_REQUIRED") {
-        toast.error("Please sign in to manage your cart");
+        toast.error("Please sign in to manage your adoption list");
         navigate("/signin");
       } else {
-        toast.error("Failed to remove item from cart.");
-        setError(err.message || "Failed to remove item from cart.");
+        toast.error("Failed to remove pet from list.");
+        setError(err.message || "Failed to remove pet from list.");
       }
     }
   };
@@ -139,7 +139,7 @@ function Cart({ onAddToCartSuccess }) {
               marginBottom: "1rem",
             }}
           >
-            🛒
+            🐾
           </div>
           <h1
             style={{
@@ -152,7 +152,7 @@ function Cart({ onAddToCartSuccess }) {
               marginBottom: "1rem",
             }}
           >
-            Your Cart is Empty
+            No Pets Selected Yet
           </h1>
           <p
             style={{
@@ -161,7 +161,7 @@ function Cart({ onAddToCartSuccess }) {
               fontSize: "1.1rem",
             }}
           >
-            Looks like you haven't added anything to your cart yet.
+            Start browsing to find your perfect furry companion!
           </p>
           <Button
             variant="primary"
@@ -185,7 +185,7 @@ function Cart({ onAddToCartSuccess }) {
               e.target.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.4)";
             }}
           >
-            Start Shopping 🐾
+            Browse Available Pets 🐕
           </Button>
         </Container>
 
@@ -226,10 +226,10 @@ function Cart({ onAddToCartSuccess }) {
               marginBottom: "0.5rem",
             }}
           >
-            Your Shopping Cart
+            Your Adoption List
           </h1>
           <p style={{ color: "#6b7280", fontSize: "1.1rem" }}>
-            Review your items before checkout
+            Review the pets you're interested in adopting
           </p>
         </div>
 
@@ -258,10 +258,10 @@ function Cart({ onAddToCartSuccess }) {
                     style={{ fontWeight: "700", color: "#374151", margin: 0 }}
                   >
                     <i
-                      className="bi bi-bag-check-fill me-2"
-                      style={{ color: "#6366f1" }}
+                      className="bi bi-heart-fill me-2"
+                      style={{ color: "#ef4444" }}
                     ></i>
-                    Items in Cart
+                    Selected Pets
                     <Badge
                       bg="primary"
                       style={{
@@ -272,7 +272,7 @@ function Cart({ onAddToCartSuccess }) {
                         padding: "0.4rem 0.8rem",
                       }}
                     >
-                      {cart.quantityTotal} items
+                      {cart.quantityTotal} pets
                     </Badge>
                   </h5>
                 </div>
@@ -335,11 +335,24 @@ function Cart({ onAddToCartSuccess }) {
                             fontSize: "0.9rem",
                           }}
                         >
-                          Premium Quality Pet Product
+                          <i
+                            className="bi bi-geo-alt-fill me-1"
+                            style={{ color: "#6366f1" }}
+                          ></i>
+                          Ready for adoption
                         </p>
                       </div>
 
                       <div style={{ textAlign: "right", marginRight: "2rem" }}>
+                        <p
+                          style={{
+                            color: "#6b7280",
+                            fontSize: "0.9rem",
+                            marginBottom: "0.25rem",
+                          }}
+                        >
+                          Adoption Fee
+                        </p>
                         <p
                           style={{
                             fontSize: "1.5rem",
@@ -379,7 +392,7 @@ function Cart({ onAddToCartSuccess }) {
                           e.target.style.transform = "scale(1)";
                         }}
                       >
-                        <i className="bi bi-trash3-fill"></i> Remove
+                        <i className="bi bi-x-circle-fill"></i> Remove
                       </Button>
                     </div>
                   ))}
@@ -409,10 +422,10 @@ function Cart({ onAddToCartSuccess }) {
                   }}
                 >
                   <i
-                    className="bi bi-receipt me-2"
+                    className="bi bi-clipboard-check me-2"
                     style={{ color: "#6366f1" }}
                   ></i>
-                  Order Summary
+                  Adoption Summary
                 </h5>
 
                 <div
@@ -433,13 +446,13 @@ function Cart({ onAddToCartSuccess }) {
                       color: "#6b7280",
                     }}
                   >
-                    <span>Subtotal ({cart.quantityTotal} items):</span>
+                    <span>Number of Pets:</span>
                     <span style={{ fontWeight: "600", color: "#4b5563" }}>
-                      ₹{cart.amountTotal.toFixed(2)}
+                      {cart.quantityTotal}
                     </span>
                   </div>
 
-                  {/* <div
+                  <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -448,11 +461,11 @@ function Cart({ onAddToCartSuccess }) {
                       color: "#6b7280",
                     }}
                   >
-                    <span>Shipping:</span>
-                    <span style={{ fontWeight: "600", color: "#10b981" }}>
-                      FREE
+                    <span>Total Adoption Fees:</span>
+                    <span style={{ fontWeight: "600", color: "#4b5563" }}>
+                      ₹{cart.amountTotal.toFixed(2)}
                     </span>
-                  </div> */}
+                  </div>
 
                   <hr style={{ margin: "1rem 0", borderColor: "#e5e7eb" }} />
 
@@ -474,21 +487,22 @@ function Cart({ onAddToCartSuccess }) {
                   </div>
                 </div>
 
-                {/* <div
+                <div
                   style={{
                     background:
-                      "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                    color: "white",
-                    padding: "0.75rem",
+                      "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+                    color: "#92400e",
+                    padding: "1rem",
                     borderRadius: "10px",
                     textAlign: "center",
                     marginBottom: "1.5rem",
                     fontWeight: "600",
+                    fontSize: "0.9rem",
                   }}
                 >
-                  <i className="bi bi-truck me-2"></i>
-                  Free Delivery on this order!
-                </div> */}
+                  <i className="bi bi-info-circle-fill me-2"></i>
+                  Adoption fees help cover medical care and shelter costs
+                </div>
 
                 <Button
                   variant="primary"
@@ -520,7 +534,7 @@ function Cart({ onAddToCartSuccess }) {
                   }}
                 >
                   <span style={{ position: "relative", zIndex: 1 }}>
-                    Proceed to Checkout
+                    Continue to Application
                     <i className="bi bi-arrow-right-circle-fill ms-2"></i>
                   </span>
                 </Button>
@@ -542,38 +556,28 @@ function Cart({ onAddToCartSuccess }) {
                     }}
                   >
                     <i
-                      className="bi bi-shield-check me-1"
+                      className="bi bi-clock-fill me-1"
                       style={{ color: "#10b981" }}
                     ></i>
-                    Secure Checkout
+                    Next Steps
                   </p>
-                  <div
+                  <p
                     style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: "0.5rem",
+                      color: "#4b5563",
+                      fontSize: "0.85rem",
+                      marginBottom: 0,
                     }}
                   >
-                    <i
-                      className="bi bi-credit-card"
-                      style={{ fontSize: "1.5rem", color: "#6b7280" }}
-                    ></i>
-                    <i
-                      className="bi bi-paypal"
-                      style={{ fontSize: "1.5rem", color: "#6b7280" }}
-                    ></i>
-                    <i
-                      className="bi bi-lock-fill"
-                      style={{ fontSize: "1.5rem", color: "#6b7280" }}
-                    ></i>
-                  </div>
+                    Complete adoption application • Home visit • Meet your new
+                    pet
+                  </p>
                 </div>
               </Card.Body>
             </Card>
 
-            {/* <Card
+            <Card
               style={{
-                background: "linear-gradient(135deg, #f3f4f6 0%, #faf5ff 100%)",
+                background: "linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%)",
                 borderRadius: "20px",
                 border: "1px solid #e5e7eb",
                 marginTop: "1.5rem",
@@ -582,10 +586,10 @@ function Cart({ onAddToCartSuccess }) {
             >
               <div style={{ textAlign: "center" }}>
                 <i
-                  className="bi bi-gift-fill"
+                  className="bi bi-house-heart-fill"
                   style={{
                     fontSize: "2rem",
-                    color: "#a855f7",
+                    color: "#6366f1",
                     marginBottom: "0.5rem",
                     display: "block",
                   }}
@@ -597,13 +601,19 @@ function Cart({ onAddToCartSuccess }) {
                     marginBottom: "0.5rem",
                   }}
                 >
-                  Have a promo code?
+                  Why Adopt?
                 </h6>
-                <p style={{ color: "#6b7280", fontSize: "0.9rem" }}>
-                  Add it at checkout for discounts
+                <p
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "0.9rem",
+                    marginBottom: 0,
+                  }}
+                >
+                  Give a loving pet a second chance at happiness
                 </p>
               </div>
-            </Card> */}
+            </Card>
           </Col>
         </Row>
       </Container>
