@@ -5,6 +5,7 @@ import com.example.demo.service.CartService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,11 @@ public class CartController {
     private CartService cartService;
 
     @GetMapping
-    public ResponseEntity<?> getCart(HttpServletRequest request) {
+    public ResponseEntity<?> getCart(HttpServletRequest request, Authentication authentication) {
         try {
+            if (authentication != null && authentication.isAuthenticated()) {
+                request.getSession().setAttribute("userId", authentication.getName());
+            }
             CartInfo cartInfo = cartService.getCartInSession(request);
             return ResponseEntity.ok(cartInfo);
         } catch (Exception e) {

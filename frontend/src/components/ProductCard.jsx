@@ -41,14 +41,13 @@ function ProductCard({ product, onAddToCartSuccess, isAddedToCart, isAdmin }) {
       if (isAddedToCart) {
         await cartService.removeFromCart(product.code);
         toast.error("Removed from cart!", {
-          style: {
-            background: "#dc3545",
-            color: "white",
-          },
+          autoClose: 1000,
         });
       } else {
         await cartService.addToCart(product.code, 1);
-        toast.success("Added to cart!");
+        toast.success("Added to cart!", {
+          autoClose: 1000,
+        });
       }
       // Toggle the cart state after successful operation
       if (onAddToCartSuccess) {
