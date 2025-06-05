@@ -1,0 +1,141 @@
+.custom-navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  background-color: white !important;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.brand-name:hover {
+  transform: scale(1.05);
+}
+
+.brand-icon {
+  font-size: 1.8rem;
+}
+
+.nav-link-custom {
+  color: var(--text-color) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-link-custom:hover {
+  color: var(--primary-color) !important;
+}
+
+.nav-link-custom::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: var(--primary-color);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link-custom:hover::after {
+  width: 80%;
+}
+
+.admin-link {
+  color: var(--danger-color) !important;
+}
+
+.admin-link:hover {
+  color: var(--danger-color) !important;
+}
+
+.admin-link::after {
+  background-color: var(--danger-color);
+}
+
+.user-greeting {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .custom-navbar {
+    padding: 0.5rem 1rem;
+  }
+
+  .nav-link-custom {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .nav-link-custom::after {
+    display: none;
+  }
+
+  .user-greeting {
+    margin: 0.5rem 0;
+  }
+
+  .d-flex.align-items-center {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.5rem;
+  }
+
+  .d-flex.gap-2 {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .d-flex.gap-2 .btn {
+    width: 100%;
+  }
+}
+
+/* Animation for navbar collapse */
+.navbar-collapse {
+  transition: all 0.3s ease;
+}
+
+/* Custom button styles */
+.btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.btn-outline-danger {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+  color: white;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}

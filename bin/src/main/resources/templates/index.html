@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Online Pet Shop - Find a wide range of pets and pet supplies"
+    />
+    <title>Online Pet Shop - Your Trusted Pet Store</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <th:block th:include="/header"></th:block>
+    <th:block th:include="/menu"></th:block>
+
+    <main>
+      <div class="page-title">Welcome to Pet Mart</div>
+      <div class="demo-container">
+        <h3>Your Trusted Pet Shop</h3>
+        <p>
+          Discover a wide range of pets and pet supplies at Pet Mart. We offer
+          various breeds of dogs, cats, birds, and other pets, along with
+          high-quality pet food, toys, and accessories.
+        </p>
+        <p>
+          Browse our extensive collection and find your perfect companion today!
+        </p>
+        <div class="cta-buttons">
+          <a href="/productList" class="button-primary">View Our Pets</a>
+          <a href="/shoppingCart" class="button-secondary">View Cart</a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-container">
+      <p>&copy; 2024 Pet Mart. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
