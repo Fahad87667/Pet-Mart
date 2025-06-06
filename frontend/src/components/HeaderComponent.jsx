@@ -367,7 +367,7 @@ function Header({
                     >
                       {userName?.charAt(0).toUpperCase()}
                     </div>
-                    Profile
+                    {userName ? userName : "Profile"}
                   </Nav.Link>
                   {isAdmin && <span style={adminBadgeStyle}>Admin</span>}
                   <Button
