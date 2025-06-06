@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "Pet Mart Full Stack Application",
   "scripts": {
-    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "dev": "concurrently --kill-others \"cross-env-shell npm run backend\" \"cross-env-shell npm run frontend\"",
     "backend": "mvnw.cmd spring-boot:run",
-    "frontend": "cd frontend && npm run start",
-    "install-all": "cd frontend && npm install && cd .. && ./mvnw.cmd clean install"
+    "frontend": "cd frontend && npm start",
+    "install-all": "npm install && cd frontend && npm install && cd .. && mvnw.cmd clean install"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3"
   }
 }
