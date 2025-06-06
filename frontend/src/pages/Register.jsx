@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Card,
@@ -10,10 +10,23 @@ import {
   InputGroup,
   ToggleButtonGroup,
   ToggleButton,
+  ProgressBar,
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { register } from "../services/authService";
-import { FaEye, FaEyeSlash, FaUser, FaUserShield } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaUser,
+  FaUserShield,
+  FaEnvelope,
+  FaPhone,
+  FaLock,
+  FaKey,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaPaw,
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 
 function Register({ updateAuthState }) {
@@ -54,11 +67,8 @@ function Register({ updateAuthState }) {
     } else if (formData.firstName.length < 2) {
       errors.firstName = "First name must be at least 2 characters";
       isValid = false;
-    } else if (formData.firstName.length > 50) {
-      errors.firstName = "First name must not exceed 50 characters";
-      isValid = false;
     } else if (!/^[a-zA-Z\s]*$/.test(formData.firstName)) {
-      errors.firstName = "First name can only contain letters and spaces";
+      errors.firstName = "First name can only contain letters";
       isValid = false;
     }
 
@@ -69,11 +79,8 @@ function Register({ updateAuthState }) {
     } else if (formData.lastName.length < 2) {
       errors.lastName = "Last name must be at least 2 characters";
       isValid = false;
-    } else if (formData.lastName.length > 50) {
-      errors.lastName = "Last name must not exceed 50 characters";
-      isValid = false;
     } else if (!/^[a-zA-Z\s]*$/.test(formData.lastName)) {
-      errors.lastName = "Last name can only contain letters and spaces";
+      errors.lastName = "Last name can only contain letters";
       isValid = false;
     }
 
@@ -85,9 +92,6 @@ function Register({ updateAuthState }) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         errors.email = "Please enter a valid email address";
-        isValid = false;
-      } else if (formData.email.length > 100) {
-        errors.email = "Email must not exceed 100 characters";
         isValid = false;
       }
     }
@@ -108,21 +112,6 @@ function Register({ updateAuthState }) {
     } else if (formData.password.length < 8) {
       errors.password = "Password must be at least 8 characters";
       isValid = false;
-    } else if (formData.password.length > 50) {
-      errors.password = "Password must not exceed 50 characters";
-      isValid = false;
-    } else if (!/(?=.*[a-z])/.test(formData.password)) {
-      errors.password = "Password must contain at least one lowercase letter";
-      isValid = false;
-    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
-      errors.password = "Password must contain at least one uppercase letter";
-      isValid = false;
-    } else if (!/(?=.*\d)/.test(formData.password)) {
-      errors.password = "Password must contain at least one number";
-      isValid = false;
-    } else if (!/(?=.*[@$!%*?&])/.test(formData.password)) {
-      errors.password = "Password must contain at least one special character (@$!%*?&)";
-      isValid = false;
     }
 
     // Confirm Password validation
@@ -135,14 +124,9 @@ function Register({ updateAuthState }) {
     }
 
     // Secret Key validation (only for admin)
-    if (userType === "admin") {
-      if (!formData.secretKey.trim()) {
-        errors.secretKey = "Secret key is required for admin registration";
-        isValid = false;
-      } else if (formData.secretKey.trim() !== "ADMIN123") {
-        errors.secretKey = "Invalid secret key";
-        isValid = false;
-      }
+    if (userType === "admin" && !formData.secretKey.trim()) {
+      errors.secretKey = "Secret key is required for admin registration";
+      isValid = false;
     }
 
     setValidationErrors(errors);
@@ -151,9 +135,7 @@ function Register({ updateAuthState }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setError("");
     setLoading(true);
@@ -172,8 +154,9 @@ function Register({ updateAuthState }) {
       const user = await register(userData);
       if (user) {
         updateAuthState(user);
-        toast.success("Registered successfully!", {
-          autoClose: 1000,
+        toast.success("Welcome to Pet-Mart! 🎉", {
+          autoClose: 1500,
+          position: "top-center",
         });
         navigate("/");
       }
@@ -188,30 +171,13 @@ function Register({ updateAuthState }) {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-    // Clear validation error when user starts typing
     if (validationErrors[name]) {
-      setValidationErrors({
-        ...validationErrors,
-        [name]: "",
-      });
+      setValidationErrors({ ...validationErrors, [name]: "" });
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const toggleSecretKeyVisibility = () => {
-    setShowSecretKey(!showSecretKey);
   };
 
   const handleUserTypeChange = (val) => {
     setUserType(val);
-    // Clear secret key when switching user types
     setFormData({ ...formData, secretKey: "" });
     setValidationErrors({ ...validationErrors, secretKey: "" });
   };
@@ -219,386 +185,514 @@ function Register({ updateAuthState }) {
   const styles = {
     container: {
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #e0e7ff 0%, #f0e6ff 100%)",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       display: "flex",
       alignItems: "center",
       padding: "2rem 0",
+      position: "relative",
+      overflow: "hidden",
+    },
+    backgroundPattern: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      opacity: 0.1,
+      background: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
     },
     card: {
       borderRadius: "25px",
       border: "none",
-      boxShadow: "0 15px 35px rgba(99, 102, 241, 0.2)",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
       padding: "2.5rem",
-      maxWidth: "600px",
       margin: "0 auto",
+      background: "rgba(255, 255, 255, 0.98)",
+      backdropFilter: "blur(20px)",
+      animation: "slideIn 0.6s ease-out",
     },
     logo: {
-      width: "70px",
-      height: "70px",
-      background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-      borderRadius: "20px",
+      width: "80px",
+      height: "80px",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      borderRadius: "50%",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       margin: "0 auto 1.5rem",
-      fontSize: "2rem",
-      boxShadow: "0 8px 25px rgba(99, 102, 241, 0.3)",
+      fontSize: "2.5rem",
+      color: "white",
+      boxShadow: "0 10px 30px rgba(102, 126, 234, 0.4)",
     },
     title: {
-      fontSize: "2rem",
+      fontSize: "2.5rem",
       fontWeight: "700",
       textAlign: "center",
+      marginBottom: "0.5rem",
+      color: "#1a202c",
+      fontFamily: "'Poppins', sans-serif",
+    },
+    subtitle: {
+      textAlign: "center",
+      fontSize: "1rem",
+      color: "#718096",
       marginBottom: "2rem",
-      background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
+      fontFamily: "'Inter', sans-serif",
     },
     input: {
-      border: "2px solid #e5e7eb",
+      border: "2px solid #e2e8f0",
       borderRadius: "12px",
-      padding: "0.75rem 1rem",
+      padding: "0.75rem 1rem 0.75rem 3rem",
       transition: "all 0.3s ease",
+      backgroundColor: "#f7fafc",
+      fontSize: "1rem",
+      fontFamily: "'Inter', sans-serif",
     },
-    inputError: {
-      border: "2px solid #ef4444",
+    inputIcon: {
+      position: "absolute",
+      left: "1rem",
+      top: "50%",
+      transform: "translateY(-50%)",
+      color: "#667eea",
+      fontSize: "1.1rem",
+      zIndex: 2,
     },
     errorText: {
       color: "#ef4444",
       fontSize: "0.875rem",
       marginTop: "0.25rem",
-    },
-    button: {
-      background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-      border: "none",
-      borderRadius: "25px",
-      padding: "0.75rem",
-      fontSize: "1.1rem",
-      fontWeight: "600",
-      width: "100%",
-      boxShadow: "0 6px 20px rgba(99, 102, 241, 0.3)",
-      transition: "all 0.3s ease",
-    },
-    passwordToggle: {
-      cursor: "pointer",
-      position: "absolute",
-      right: "10px",
-      top: "50%",
-      transform: "translateY(-50%)",
-      color: "#9ca3af",
-    },
-    toggleGroup: {
-      width: "100%",
-      marginBottom: "1.5rem",
-      borderRadius: "12px",
-      overflow: "hidden",
-      border: "2px solid #e5e7eb",
-    },
-    toggleButton: {
-      width: "50%",
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
-      gap: "0.5rem",
+      gap: "0.25rem",
+    },
+    formControl: {
+      borderRadius: "12px",
+      padding: "0.75rem 1.25rem",
+      fontSize: "1rem",
+      border: "1px solid #ced4da",
+      transition:
+        "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+    },
+    inputGroupText: {
+      borderRadius: "12px 0 0 12px",
+      backgroundColor: "#e9ecef",
+      border: "1px solid #ced4da",
+      borderRight: "none",
+      padding: "0.75rem 1.25rem",
+    },
+    button: {
+      borderRadius: "25px",
+      padding: "0.75rem 2rem",
+      fontWeight: "600",
+      fontSize: "1.1rem",
+      marginTop: "1.5rem",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      border: "none",
+      boxShadow: "0 8px 20px rgba(118, 75, 162, 0.3)",
+      transition: "all 0.3s ease",
+    },
+    buttonHover: {
+      background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
+      boxShadow: "0 12px 30px rgba(118, 75, 162, 0.4)",
+      transform: "translateY(-2px)",
+    },
+    toggleButton: {
+      borderRadius: "25px",
+      padding: "0.5rem 1.5rem",
+      margin: "0 0.5rem",
+      fontWeight: "600",
+      border: "1px solid #667eea",
+      color: "#667eea",
+      backgroundColor: "transparent",
+      transition: "all 0.3s ease",
+    },
+    toggleButtonActive: {
+      backgroundColor: "#667eea",
+      color: "white",
+      boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+    },
+    alert: {
+      borderRadius: "12px",
+      marginTop: "1.5rem",
+    },
+    signinLink: {
+      marginTop: "1.5rem",
+      textAlign: "center",
+      color: "#1f2937",
+    },
+    link: {
+      color: "#667eea",
+      fontWeight: "600",
+      textDecoration: "none",
+    },
+    linkHover: {
+      textDecoration: "underline",
+    },
+    eyeButton: {
+      borderLeft: "none",
+      borderRadius: "0 12px 12px 0",
     },
   };
 
+  // Add CSS for animations
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+      
+      .register-button:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+        box-shadow: 0 12px 30px rgba(118, 75, 162, 0.4) !important;
+        transform: translateY(-2px);
+      }
+      
+      .toggle-button:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(118, 75, 162, 0.25);
+        border-color: #764ba2;
+      }
+      
+      .toggle-button.active {
+        background-color: #667eea !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+      
+      .signin-link a:hover {
+        text-decoration: underline;
+      }
+      
+      @media (max-width: 576px) {
+        .register-card {
+          padding: 1.5rem !important;
+          max-width: 95vw;
+        }
+      }
+      
+      @media (min-width: 577px) and (max-width: 768px) {
+        .register-card {
+          max-width: 85vw;
+        }
+      }
+      
+      @media (min-width: 769px) and (max-width: 992px) {
+        .register-card {
+          max-width: 75vw;
+        }
+      }
+      
+      @media (min-width: 993px) {
+        .register-card {
+          max-width: 700px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <div style={styles.container}>
+      <div style={styles.backgroundPattern}></div>
       <Container>
-        <Card style={styles.card}>
-          <div style={styles.logo}>🐾</div>
-          <h2 style={styles.title}>Create Account</h2>
+        <Row className="justify-content-md-center">
+          <Col xs={12} sm={10} md={8} lg={6}>
+            <Card style={styles.card} className="register-card">
+              <Card.Body>
+                <div style={styles.logo}>
+                  <FaPaw size={40} color="white" />
+                </div>
+                <Card.Title style={styles.title}>Register</Card.Title>
 
-          {error && (
-            <Alert variant="danger" dismissible onClose={() => setError("")}>
-              {error}
-            </Alert>
-          )}
-
-          <ToggleButtonGroup
-            type="radio"
-            name="userType"
-            value={userType}
-            onChange={handleUserTypeChange}
-            style={styles.toggleGroup}
-          >
-            <ToggleButton
-              id="tbg-btn-1"
-              value="user"
-              variant={userType === "user" ? "primary" : "outline-secondary"}
-              style={styles.toggleButton}
-            >
-              <FaUser /> User
-            </ToggleButton>
-            <ToggleButton
-              id="tbg-btn-2"
-              value="admin"
-              variant={userType === "admin" ? "primary" : "outline-secondary"}
-              style={styles.toggleButton}
-            >
-              <FaUserShield /> Admin
-            </ToggleButton>
-          </ToggleButtonGroup>
-
-          <Form onSubmit={handleSubmit} noValidate>
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                    First Name
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    style={{
-                      ...styles.input,
-                      ...(validationErrors.firstName && styles.inputError),
-                    }}
-                    isInvalid={!!validationErrors.firstName}
-                    required
-                    minLength={2}
-                    maxLength={50}
-                    placeholder="Enter your first name"
-                  />
-                  {validationErrors.firstName && (
-                    <Form.Text style={styles.errorText}>
-                      {validationErrors.firstName}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                    Last Name
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    style={{
-                      ...styles.input,
-                      ...(validationErrors.lastName && styles.inputError),
-                    }}
-                    isInvalid={!!validationErrors.lastName}
-                    required
-                    minLength={2}
-                    maxLength={50}
-                    placeholder="Enter your last name"
-                  />
-                  {validationErrors.lastName && (
-                    <Form.Text style={styles.errorText}>
-                      {validationErrors.lastName}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Form.Group className="mb-3">
-              <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                Email
-              </Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                style={{
-                  ...styles.input,
-                  ...(validationErrors.email && styles.inputError),
-                }}
-                isInvalid={!!validationErrors.email}
-                required
-                maxLength={100}
-                placeholder="example@gmail.com"
-              />
-              {validationErrors.email && (
-                <Form.Text style={styles.errorText}>
-                  {validationErrors.email}
-                </Form.Text>
-              )}
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                Phone
-              </Form.Label>
-              <Form.Control
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                style={{
-                  ...styles.input,
-                  ...(validationErrors.phone && styles.inputError),
-                }}
-                isInvalid={!!validationErrors.phone}
-                required
-                maxLength="10"
-                placeholder="e.g. 9876543210"
-              />
-              {validationErrors.phone && (
-                <Form.Text style={styles.errorText}>
-                  {validationErrors.phone}
-                </Form.Text>
-              )}
-            </Form.Group>
-
-            {userType === "admin" && (
-              <Form.Group className="mb-3">
-                <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                  Secret Key
-                </Form.Label>
-                <InputGroup>
-                  <Form.Control
-                    type={showSecretKey ? "text" : "password"}
-                    name="secretKey"
-                    value={formData.secretKey}
-                    onChange={handleChange}
-                    style={{
-                      ...styles.input,
-                      ...(validationErrors.secretKey && styles.inputError),
-                    }}
-                    isInvalid={!!validationErrors.secretKey}
-                    required={userType === "admin"}
-                    placeholder="Enter admin secret key"
-                  />
-                  <InputGroup.Text
-                    style={styles.passwordToggle}
-                    onClick={toggleSecretKeyVisibility}
-                  >
-                    {showSecretKey ? <FaEyeSlash /> : <FaEye />}
-                  </InputGroup.Text>
-                </InputGroup>
-                {validationErrors.secretKey ? (
-                  <Form.Text style={styles.errorText}>
-                    {validationErrors.secretKey}
-                  </Form.Text>
-                ) : (
-                  <Form.Text style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                    Required for admin registration
-                  </Form.Text>
+                {error && (
+                  <Alert variant="danger" style={styles.alert}>
+                    {error}
+                  </Alert>
                 )}
-              </Form.Group>
-            )}
 
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-4">
-                  <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                    Password
-                  </Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group controlId="userType" className="mb-3 text-center">
+                    <Form.Label
                       style={{
-                        ...styles.input,
-                        ...(validationErrors.password && styles.inputError),
+                        fontWeight: "600",
+                        marginBottom: "1rem",
+                        color: "#4b5563",
                       }}
-                      isInvalid={!!validationErrors.password}
-                      required
-                      minLength={8}
-                      maxLength={50}
-                      placeholder="Enter your password"
-                    />
-                    <InputGroup.Text
-                      style={styles.passwordToggle}
-                      onClick={togglePasswordVisibility}
                     >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </InputGroup.Text>
-                  </InputGroup>
-                  {validationErrors.password ? (
-                    <Form.Text style={styles.errorText}>
-                      {validationErrors.password}
-                    </Form.Text>
-                  ) : (
-                    <Form.Text style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                      Must contain: uppercase, lowercase, number, special character
-                    </Form.Text>
-                  )}
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-4">
-                  <Form.Label style={{ fontWeight: "600", color: "#4b5563" }}>
-                    Confirm Password
-                  </Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      style={{
-                        ...styles.input,
-                        ...(validationErrors.confirmPassword && styles.inputError),
-                      }}
-                      isInvalid={!!validationErrors.confirmPassword}
-                      required
-                      minLength={8}
-                      maxLength={50}
-                      placeholder="Confirm your password"
-                    />
-                    <InputGroup.Text
-                      style={styles.passwordToggle}
-                      onClick={toggleConfirmPasswordVisibility}
+                      Register as:
+                    </Form.Label>
+                    <br />
+                    <ToggleButtonGroup
+                      type="radio"
+                      name="userType"
+                      value={userType}
+                      onChange={handleUserTypeChange}
                     >
-                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                    </InputGroup.Text>
-                  </InputGroup>
-                  {validationErrors.confirmPassword && (
-                    <Form.Text style={styles.errorText}>
-                      {validationErrors.confirmPassword}
-                    </Form.Text>
+                      <ToggleButton
+                        id="tbg-radio-1"
+                        value={"user"}
+                        style={
+                          userType === "user"
+                            ? {
+                                ...styles.toggleButton,
+                                ...styles.toggleButtonActive,
+                              }
+                            : styles.toggleButton
+                        }
+                        className="toggle-button"
+                      >
+                        User <FaUser size={18} className="ms-2" />
+                      </ToggleButton>
+                      <ToggleButton
+                        id="tbg-radio-2"
+                        value={"admin"}
+                        style={
+                          userType === "admin"
+                            ? {
+                                ...styles.toggleButton,
+                                ...styles.toggleButtonActive,
+                              }
+                            : styles.toggleButton
+                        }
+                        className="toggle-button"
+                      >
+                        Admin <FaUserShield size={18} className="ms-2" />
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Form.Group>
+
+                  <Form.Group controlId="firstName" className="mb-3">
+                    <Form.Label style={{ fontWeight: "500" }}>
+                      First Name
+                    </Form.Label>
+                    <InputGroup hasValidation>
+                      <InputGroup.Text style={styles.inputGroupText}>
+                        <FaUser />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter first name"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        isInvalid={!!validationErrors.firstName}
+                        style={styles.formControl}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {validationErrors.firstName}
+                      </Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  <Form.Group controlId="lastName" className="mb-3">
+                    <Form.Label style={{ fontWeight: "500" }}>
+                      Last Name
+                    </Form.Label>
+                    <InputGroup hasValidation>
+                      <InputGroup.Text style={styles.inputGroupText}>
+                        <FaUser />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter last name"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        isInvalid={!!validationErrors.lastName}
+                        style={styles.formControl}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {validationErrors.lastName}
+                      </Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  <Form.Group controlId="email" className="mb-3">
+                    <Form.Label style={{ fontWeight: "500" }}>
+                      Email address
+                    </Form.Label>
+                    <InputGroup hasValidation>
+                      <InputGroup.Text style={styles.inputGroupText}>
+                        <FaEnvelope />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="email"
+                        placeholder="Enter email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        isInvalid={!!validationErrors.email}
+                        style={styles.formControl}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {validationErrors.email}
+                      </Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  <Form.Group controlId="phone" className="mb-3">
+                    <Form.Label style={{ fontWeight: "500" }}>
+                      Phone Number
+                    </Form.Label>
+                    <InputGroup hasValidation>
+                      <InputGroup.Text style={styles.inputGroupText}>
+                        <FaPhone />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter phone number"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        isInvalid={!!validationErrors.phone}
+                        style={styles.formControl}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {validationErrors.phone}
+                      </Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  <Form.Group controlId="password" className="mb-3">
+                    <Form.Label style={{ fontWeight: "500" }}>
+                      Password
+                    </Form.Label>
+                    <InputGroup hasValidation>
+                      <InputGroup.Text style={styles.inputGroupText}>
+                        <FaLock />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        isInvalid={!!validationErrors.password}
+                        style={styles.formControl}
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={styles.eyeButton}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </Button>
+                      <Form.Control.Feedback type="invalid">
+                        {validationErrors.password}
+                      </Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  <Form.Group controlId="confirmPassword" className="mb-3">
+                    <Form.Label style={{ fontWeight: "500" }}>
+                      Confirm Password
+                    </Form.Label>
+                    <InputGroup hasValidation>
+                      <InputGroup.Text style={styles.inputGroupText}>
+                        <FaLock />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        isInvalid={!!validationErrors.confirmPassword}
+                        style={styles.formControl}
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        style={styles.eyeButton}
+                      >
+                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      </Button>
+                      <Form.Control.Feedback type="invalid">
+                        {validationErrors.confirmPassword}
+                      </Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  {userType === "admin" && (
+                    <Form.Group controlId="secretKey" className="mb-3">
+                      <Form.Label style={{ fontWeight: "500" }}>
+                        Secret Key
+                      </Form.Label>
+                      <InputGroup hasValidation>
+                        <InputGroup.Text style={styles.inputGroupText}>
+                          <FaKey />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type={showSecretKey ? "text" : "password"}
+                          placeholder="Enter secret key"
+                          name="secretKey"
+                          value={formData.secretKey}
+                          onChange={handleChange}
+                          isInvalid={!!validationErrors.secretKey}
+                          style={styles.formControl}
+                        />
+                        <Button
+                          variant="outline-secondary"
+                          onClick={() => setShowSecretKey(!showSecretKey)}
+                          style={styles.eyeButton}
+                        >
+                          {showSecretKey ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                        <Form.Control.Feedback type="invalid">
+                          {validationErrors.secretKey}
+                        </Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
                   )}
-                </Form.Group>
-              </Col>
-            </Row>
 
-            <Button
-              type="submit"
-              style={styles.button}
-              disabled={loading}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow = "0 8px 25px rgba(99, 102, 241, 0.4)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "0 6px 20px rgba(99, 102, 241, 0.3)";
-                }
-              }}
-            >
-              {loading ? "Signing Up..." : "Sign Up"}
-            </Button>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={loading}
+                    className="w-100 register-button"
+                    style={styles.button}
+                  >
+                    {loading ? "Registering..." : "Register"}
+                  </Button>
+                </Form>
 
-            <div className="text-center mt-4">
-              <span style={{ color: "#6b7280" }}>Already have an account? </span>
-              <a
-                onClick={() => navigate("/signin")}
-                style={{
-                  color: "#6366f1",
-                  textDecoration: "none",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                }}
-              >
-                Sign in
-              </a>
-            </div>
-          </Form>
-        </Card>
+                <div style={styles.signinLink} className="signin-link">
+                  Already have an account?{" "}
+                  <Link to="/signin" style={styles.link}>
+                    Sign In
+                  </Link>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
       </Container>
     </div>
   );

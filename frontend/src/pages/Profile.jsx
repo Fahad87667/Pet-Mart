@@ -28,11 +28,13 @@ function Profile() {
     try {
       setWithdrawingId(reservationId);
       await reservationService.withdrawReservation(reservationId);
-      setReservations(reservations.filter(r => r.id !== reservationId));
+      setReservations(reservations.filter((r) => r.id !== reservationId));
       toast.success("Reservation withdrawn successfully");
     } catch (error) {
       console.error("Error withdrawing reservation:", error);
-      toast.error(error.response?.data?.message || "Failed to withdraw reservation");
+      toast.error(
+        error.response?.data?.message || "Failed to withdraw reservation"
+      );
     } finally {
       setWithdrawingId(null);
     }
@@ -66,7 +68,11 @@ function Profile() {
         setReservationLoading(true);
         const userReservations = await reservationService.getUserReservations();
         console.log("Fetched reservations:", userReservations);
-        setReservations(userReservations || []);
+        // Sort reservations by reservationDate in descending order (most recent first)
+        const sortedReservations = userReservations.sort((a, b) => {
+          return new Date(b.reservationDate) - new Date(a.reservationDate);
+        });
+        setReservations(sortedReservations || []);
       } catch (err) {
         console.error("Error fetching reservations:", err);
         setReservationError("Failed to load reservations.");
@@ -548,15 +554,27 @@ function Profile() {
                                 alignItems: "flex-start",
                               }}
                             >
-                              <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "1rem",
+                                  alignItems: "flex-start",
+                                }}
+                              >
                                 {reservation.reservedItemsDetails &&
                                   (() => {
                                     try {
                                       const details = JSON.parse(
                                         reservation.reservedItemsDetails
                                       );
-                                      console.log("Full reservation details:", reservation);
-                                      console.log("Parsed reservation details:", details);
+                                      console.log(
+                                        "Full reservation details:",
+                                        reservation
+                                      );
+                                      console.log(
+                                        "Parsed reservation details:",
+                                        details
+                                      );
                                       if (
                                         details &&
                                         details.length > 0 &&
@@ -567,11 +585,15 @@ function Profile() {
                                           name: product.name,
                                           imagePath: product.imagePath,
                                           type: product.type,
-                                          breed: product.breed
+                                          breed: product.breed,
                                         });
                                         return (
                                           <Image
-                                            src={product.imagePath ? `http://localhost:8080${product.imagePath}` : "https://via.placeholder.com/100?text=No+Image"}
+                                            src={
+                                              product.imagePath
+                                                ? `http://localhost:8080${product.imagePath}`
+                                                : "https://via.placeholder.com/100?text=No+Image"
+                                            }
                                             alt={product.name}
                                             style={{
                                               width: "80px",
@@ -613,7 +635,8 @@ function Profile() {
                                           details.length > 0 &&
                                           details[0].productInfo
                                         ) {
-                                          const product = details[0].productInfo;
+                                          const product =
+                                            details[0].productInfo;
                                           return (
                                             <span
                                               style={{
@@ -661,7 +684,9 @@ function Profile() {
                                   <Button
                                     variant="warning"
                                     size="sm"
-                                    onClick={() => handleWithdraw(reservation.id)}
+                                    onClick={() =>
+                                      handleWithdraw(reservation.id)
+                                    }
                                     disabled={withdrawingId === reservation.id}
                                     style={{
                                       padding: "0.5rem 1rem",
@@ -669,9 +694,11 @@ function Profile() {
                                       fontWeight: "600",
                                       borderRadius: "20px",
                                       border: "none",
-                                      background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                                      background:
+                                        "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
                                       color: "white",
-                                      boxShadow: "0 2px 4px rgba(245, 158, 11, 0.2)",
+                                      boxShadow:
+                                        "0 2px 4px rgba(245, 158, 11, 0.2)",
                                     }}
                                   >
                                     {withdrawingId === reservation.id ? (
