@@ -80,7 +80,7 @@ function Header({
     justifyContent: "center",
     boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
     transition: "transform 0.3s ease",
-    overflow: "hidden"
+    overflow: "hidden",
   };
 
   const brandTextStyle = {
@@ -215,14 +215,14 @@ function Header({
                 e.target.style.transform = "rotate(0deg) scale(1)";
               }}
             >
-              <img 
-                src="/images/logo.jpg" 
-                alt="Pet-Mart Logo" 
+              <img
+                src="/images/logo.jpg"
+                alt="Pet-Mart Logo"
                 style={{
                   width: "100%",
                   height: "100%",
                   objectFit: "contain",
-                  padding: "8px"
+                  padding: "8px",
                 }}
               />
             </div>
@@ -329,37 +329,47 @@ function Header({
 
               {isLoggedIn ? (
                 <div className="d-flex align-items-center gap-3">
-                  <div className="d-flex align-items-center">
+                  <Nav.Link
+                    onClick={() => navigate("/profile")}
+                    style={{
+                      ...navLinkStyle,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = "rgba(99, 102, 241, 0.1)";
+                      e.target.style.color = "#6366f1";
+                      e.target.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = "transparent";
+                      e.target.style.color = "#4b5563";
+                      e.target.style.transform = "translateY(0)";
+                    }}
+                  >
                     <div
                       style={{
-                        width: "36px",
-                        height: "36px",
+                        width: "30px",
+                        height: "30px",
                         background:
                           "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
                         borderRadius: "50%",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        marginRight: "12px",
-                        boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
+                        boxShadow: "0 2px 8px rgba(99, 102, 241, 0.2)",
+                        color: "white",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        fontFamily: "Inter, -apple-system, sans-serif",
                       }}
                     >
-                      <span
-                        style={{
-                          color: "white",
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          fontFamily: "Inter, -apple-system, sans-serif",
-                        }}
-                      >
-                        {userName?.charAt(0).toUpperCase()}
-                      </span>
+                      {userName?.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <span style={userGreetingStyle}>Welcome, {userName}</span>
-                      {isAdmin && <span style={adminBadgeStyle}>Admin</span>}
-                    </div>
-                  </div>
+                    Profile
+                  </Nav.Link>
+                  {isAdmin && <span style={adminBadgeStyle}>Admin</span>}
                   <Button
                     style={logoutButtonStyle}
                     onClick={handleLogout}

@@ -74,5 +74,10 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    // New method to get reservations by customer email
+    public List<Reservation> getReservationsByCustomerEmail(String customerEmail) {
+        return reservationRepository.findByCustomerEmail(customerEmail);
+    }
+
     // You might want methods to get reservations by status, customer, etc.
 } 

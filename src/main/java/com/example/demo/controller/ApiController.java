@@ -204,6 +204,33 @@ public class ApiController {
         }
     }
 
+    @GetMapping("/reservations/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUserReservations() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+                 return ResponseEntity.status(401).body("User not authenticated");
+            }
+
+            String userEmail = authentication.getName();
+
+            List<Reservation> userReservations = reservationService.getReservationsByCustomerEmail(userEmail);
+
+            logger.debug("Found {} reservations for user {}", userReservations.size(), userEmail);
+
+            return ResponseEntity.ok(userReservations);
+
+        } catch (Exception e) {
+            logger.error("Error fetching user reservations", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to fetch user reservations");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
     @GetMapping("/products")
     public ResponseEntity<?> getProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,

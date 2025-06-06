@@ -13,6 +13,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import ReservationStatus from "./pages/ReservationStatus";
 import Contact from "./pages/Contact";
+import Profile from "./pages/Profile";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -96,10 +97,18 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route
               path="/find-pet"
-              element={<FindPet onAddToCartSuccess={triggerCartUpdate} isAdmin={isAdmin} />}
+              element={
+                <FindPet
+                  onAddToCartSuccess={triggerCartUpdate}
+                  isAdmin={isAdmin}
+                />
+              }
             />
             <Route path="/about" element={<About />} />
-            <Route path="/cart" element={<Cart onAddToCartSuccess={triggerCartUpdate} />} />
+            <Route
+              path="/cart"
+              element={<Cart onAddToCartSuccess={triggerCartUpdate} />}
+            />
             <Route
               path="/admin"
               element={<Admin isLoggedIn={isLoggedIn} isAdmin={isAdmin} />}
@@ -113,9 +122,13 @@ function App() {
               element={<SignIn updateAuthState={updateAuthState} />}
             />
             <Route path="/product/:code" element={<ProductDetails />} />
-            <Route path="/checkout" element={<Checkout onAddToCartSuccess={triggerCartUpdate} />} />
+            <Route
+              path="/checkout"
+              element={<Checkout onAddToCartSuccess={triggerCartUpdate} />}
+            />
             <Route path="/reservation-status" element={<ReservationStatus />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/profile" element={<Profile />} />
             {/* Add more routes here as needed */}
           </Routes>
         </Container>
