@@ -6,27 +6,54 @@ function About() {
   const teamMembers = [
     {
       name: "Fahad Khan",
-      role: "UI/UX Designer",
-      bio: "With over 5 years of experience in React and Node.js, Fahad led the technical architecture and backend development. He's passionate about creating scalable solutions and clean code.",
-      skills: ["React", "Node.js", "MYSQL", "AWS", "Prototyping", "Design Systems", "Git and GitHub"],
-      icon: "🎨",
-      image: "./public/images/fahad.jpg"
+      role: "Full Stack Developer",
+      bio: "Led the development of Pet-Mart, a comprehensive pet store platform. Implemented secure user authentication, product management, and shopping cart functionality using Spring Boot and React. Developed RESTful APIs, integrated MySQL database, and created responsive UI components. Successfully implemented features like user registration, product search, and order management.",
+      skills: [
+        "Spring Boot",
+        "React",
+        "MySQL",
+        "REST APIs",
+        "Security",
+        "Git",
+        "Maven",
+        "JavaScript",
+        "HTML/CSS",
+      ],
+      icon: "💻",
+      image: "./public/images/fahad.jpg",
     },
     {
       name: "Mohammad Saif",
       role: "Full Stack Developer",
       bio: "Saif is a passionate full-stack developer with hands-on experience in building responsive web applications using Spring Boot and React. He specializes in developing clean RESTful APIs, scalable backend systems with Java and MySQL, and dynamic user interfaces using React.js. With a strong understanding of both frontend and backend technologies, Saif enjoys creating seamless, user-focused applications backed by robust architecture.",
-      skills: ["Java", "Spring Boot", "RESTful API Development", "MySQL or PostgreSQL", "React.js", "JavaScript (ES6+)", "HTML5 & CSS3", "Git and GitHub"],
+      skills: [
+        "Java",
+        "Spring Boot",
+        "RESTful API Development",
+        "MySQL or PostgreSQL",
+        "React.js",
+        "JavaScript (ES6+)",
+        "HTML5 & CSS3",
+        "Git and GitHub",
+      ],
       icon: "💻",
-      image: "./public/images/saif.jpg"
+      image: "./public/images/saif.jpg",
     },
     {
       name: "Sumayya Khan",
-      role: "Product Manager",
-      bio: "Emily coordinated the entire project from concept to launch. Her strategic thinking and attention to detail kept the team focused on delivering real value to users.",
-      skills: ["Strategy", "Analytics", "Agile", "User Stories"],
-      icon: "⚡",
-      image: "./public/images/sumayya.jpg"
+      role: "Frontend Developer",
+      bio: "Contributed to Pet-Mart's frontend development, focusing on creating an intuitive and responsive user interface. Implemented product listing, search functionality, and user dashboard components. Worked on enhancing user experience through interactive features and smooth navigation. Collaborated on integrating frontend with Spring Boot backend services.",
+      skills: [
+        "React",
+        "JavaScript",
+        "HTML/CSS",
+        "Bootstrap",
+        "Git",
+        "API Integration",
+        "Responsive Design",
+      ],
+      icon: "👩‍💻",
+      image: "./public/images/sumayya.jpg",
     },
   ];
 
@@ -232,7 +259,11 @@ function About() {
                   <Card.Body>
                     <div className="d-flex align-items-center mb-4">
                       <div style={styles.memberIcon}>
-                        <img src={member.image} alt={member.name} style={styles.memberImage} />
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          style={styles.memberImage}
+                        />
                       </div>
                       <div>
                         <h3 style={styles.memberName}>{member.name}</h3>
@@ -353,13 +384,11 @@ function About() {
             style={styles.ctaButton}
             onMouseEnter={(e) => {
               e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow =
-                "0 8px 25px rgba(99, 102, 241, 0.4)";
+              e.target.style.boxShadow = "0 8px 25px rgba(99, 102, 241, 0.4)";
             }}
             onMouseLeave={(e) => {
               e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow =
-                "0 6px 20px rgba(99, 102, 241, 0.3)";
+              e.target.style.boxShadow = "0 6px 20px rgba(99, 102, 241, 0.3)";
             }}
             onClick={() => navigate("/contact")}
           >
