@@ -181,6 +181,35 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>force-clean</id>
+						<phase>pre-clean</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<exec executable="cmd" osfamily="windows">
+									<arg value="/c"/>
+									<arg value="rmdir"/>
+									<arg value="/s"/>
+									<arg value="/q"/>
+									<arg value="${project.basedir}/target"/>
+								</exec>
+								<exec executable="rm" osfamily="unix">
+									<arg value="-rf"/>
+									<arg value="${project.basedir}/target"/>
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
