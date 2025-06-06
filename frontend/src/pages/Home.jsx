@@ -50,19 +50,19 @@ function Home() {
       text: "Amazing service and happy pets! Highly recommend.",
       author: "Mrunali Jangam",
       rating: 5,
-      image: "./public/images/devi.jpg",
+      image: "/images/devi.jpg",
     },
     {
       text: "Found my perfect companion thanks to Pet-Mart.",
       author: "Mohammad Saif",
       rating: 5,
-      image: "./public/images/saif.jpg",
+      image: "/images/saif.jpg",
     },
     {
       text: "Excellent variety and great customer support.",
       author: "Mohammad Anas",
       rating: 5,
-      image: "./public/images/anas.jpg",
+      image: "/images/anas.jpg",
     },
   ];
 

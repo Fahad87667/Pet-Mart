@@ -12,6 +12,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../services/authService";
 
 function FindPet({ onAddToCartSuccess, isAdmin }) {
   const navigate = useNavigate();
@@ -22,6 +23,19 @@ function FindPet({ onAddToCartSuccess, isAdmin }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("ALL");
   const [cartItems, setCartItems] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const user = await getCurrentUser();
+        setIsLoggedIn(!!user);
+      } catch (err) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkLoginStatus();
+  }, []);
 
   const handleEdit = (productCode) => {
     navigate(`/admin?edit=${productCode}`);
@@ -248,6 +262,7 @@ function FindPet({ onAddToCartSuccess, isAdmin }) {
                   onAddToCartSuccess={handleAddToCartSuccess}
                   isAddedToCart={cartItems.includes(product.code)}
                   isAdmin={isAdmin}
+                  isLoggedIn={isLoggedIn}
                   onEdit={handleEdit}
                 />
               </Col>

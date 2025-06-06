@@ -332,7 +332,17 @@ function Header({
                 <Button
                   variant="outline-primary"
                   style={cartButtonStyle}
-                  onClick={() => navigate("/cart")}
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      toast.info("Please sign in to view your cart", {
+                        position: "top-center",
+                        autoClose: 2000,
+                        onClose: () => navigate("/signin")
+                      });
+                    } else {
+                      navigate("/cart");
+                    }
+                  }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background =
                       "linear-gradient(135deg, #6366f1, #a855f7)";

@@ -20,7 +20,7 @@ function About() {
         "HTML/CSS",
       ],
       icon: "💻",
-      image: "./public/images/fahad.jpg",
+      image: "/images/fahad.jpg",
     },
     {
       name: "Mohammad Saif",
@@ -37,7 +37,7 @@ function About() {
         "Git and GitHub",
       ],
       icon: "💻",
-      image: "./public/images/saif.jpg",
+      image: "/images/saif.jpg",
     },
     {
       name: "Sumayya Khan",

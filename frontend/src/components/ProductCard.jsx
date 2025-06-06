@@ -4,7 +4,7 @@ import { cartService } from "../services/cartService";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 
-function ProductCard({ product, onAddToCartSuccess, isAddedToCart, isAdmin }) {
+function ProductCard({ product, onAddToCartSuccess, isAddedToCart, isAdmin, isLoggedIn }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isAddingOrRemoving, setIsAddingOrRemoving] = useState(false);
   const navigate = useNavigate();
@@ -36,6 +36,15 @@ function ProductCard({ product, onAddToCartSuccess, isAddedToCart, isAdmin }) {
   };
 
   const handleCartAction = async () => {
+    if (!isLoggedIn) {
+      toast.info("Please sign in to add items to cart", {
+        position: "top-center",
+        autoClose: 2000,
+        onClose: () => navigate("/signin")
+      });
+      return;
+    }
+
     setIsAddingOrRemoving(true);
     try {
       if (isAddedToCart) {
