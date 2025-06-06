@@ -46,10 +46,6 @@ build/
 .cache/
 coverage/
 
-# Package files
-package.json
-package-lock.json
-!package.json.template
 
 # OS-specific
 Thumbs.db
