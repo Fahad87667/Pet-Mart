@@ -23,3 +23,13 @@ export const withdrawReservation = async (reservationId) => {
     throw error;
   }
 };
+
+export const clearCompletedReservations = async () => {
+  try {
+    const response = await api.delete("/reservations/clear");
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing completed reservations:", error);
+    throw error;
+  }
+};

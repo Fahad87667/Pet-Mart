@@ -29,6 +29,10 @@ function Header({
 
   useEffect(() => {
     const fetchCartCount = async () => {
+      if (!isLoggedIn) {
+        setCartItemCount(0);
+        return;
+      }
       try {
         const cart = await cartService.getCart();
         setCartItemCount(cart.quantityTotal || 0);
@@ -38,7 +42,7 @@ function Header({
       }
     };
     fetchCartCount();
-  }, [cartUpdateTrigger]);
+  }, [cartUpdateTrigger, isLoggedIn]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -337,7 +341,7 @@ function Header({
                       toast.info("Please sign in to view your cart", {
                         position: "top-center",
                         autoClose: 2000,
-                        onClose: () => navigate("/signin")
+                        onClose: () => navigate("/signin"),
                       });
                     } else {
                       navigate("/cart");

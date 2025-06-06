@@ -263,6 +263,32 @@ public class ApiController {
         }
     }
 
+    @DeleteMapping("/reservations/clear")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> clearCompletedReservations() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            List<Reservation> userReservations = reservationService.getReservationsByCustomerEmail(userEmail);
+            
+            // Filter and delete only ACCEPTED and REJECTED reservations
+            userReservations.stream()
+                .filter(reservation -> 
+                    reservation.getStatus() == Reservation.ReservationStatus.ACCEPTED || 
+                    reservation.getStatus() == Reservation.ReservationStatus.REJECTED)
+                .forEach(reservation -> reservationService.deleteReservation(reservation.getId()));
+
+            return ResponseEntity.ok().body("Completed reservations cleared successfully");
+        } catch (Exception e) {
+            logger.error("Error clearing completed reservations", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to clear completed reservations");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
     @GetMapping("/products")
     public ResponseEntity<?> getProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,

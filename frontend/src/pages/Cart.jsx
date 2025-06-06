@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cartService } from "../services/cartService";
 import { toast } from "react-toastify";
+import { getCurrentUser } from "../services/authService";
 
 function Cart({ onAddToCartSuccess }) {
   const [cart, setCart] = useState(null);
@@ -21,7 +22,19 @@ function Cart({ onAddToCartSuccess }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCart();
+    const checkAuthAndFetchCart = async () => {
+      const user = await getCurrentUser();
+      if (!user) {
+        toast.info("Please sign in to view your cart", {
+          position: "top-center",
+          autoClose: 2000,
+          onClose: () => navigate("/signin"),
+        });
+        return;
+      }
+      fetchCart();
+    };
+    checkAuthAndFetchCart();
   }, []);
 
   const fetchCart = async () => {

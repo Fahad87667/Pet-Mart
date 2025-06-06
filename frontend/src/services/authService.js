@@ -25,6 +25,7 @@ export async function logout() {
     await api.post("/signout");
   } catch (error) {
     console.error("Logout error:", error);
+    // Don't throw error on logout failure
   }
 }
 
@@ -33,6 +34,14 @@ export async function getCurrentUser() {
     const response = await api.get("/user");
     return response.data;
   } catch (error) {
+    if (error.code === "ECONNABORTED") {
+      console.error("Get current user timeout:", error);
+      return null;
+    }
+    if (!error.response) {
+      console.error("Get current user network error:", error);
+      return null;
+    }
     console.error("Get current user error:", error);
     return null;
   }
@@ -49,4 +58,3 @@ export function getUser() {
   // user information via the /user endpoint
   return null; // This will be updated by the App component based on getCurrentUser()
 }
- 

@@ -22,6 +22,7 @@ function Profile() {
   const [reservationLoading, setReservationLoading] = useState(true);
   const [reservationError, setReservationError] = useState(null);
   const [withdrawingId, setWithdrawingId] = useState(null);
+  const [clearingReservations, setClearingReservations] = useState(false);
   const navigate = useNavigate();
 
   const handleWithdraw = async (reservationId) => {
@@ -37,6 +38,24 @@ function Profile() {
       );
     } finally {
       setWithdrawingId(null);
+    }
+  };
+
+  const handleClearCompleted = async () => {
+    try {
+      setClearingReservations(true);
+      await reservationService.clearCompletedReservations();
+      // Update the reservations list by removing ACCEPTED and REJECTED ones
+      setReservations(reservations.filter((r) => r.status === "PENDING"));
+      toast.success("Completed reservations cleared successfully");
+    } catch (error) {
+      console.error("Error clearing completed reservations:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to clear completed reservations"
+      );
+    } finally {
+      setClearingReservations(false);
     }
   };
 
@@ -492,6 +511,36 @@ function Profile() {
                     padding: "1.5rem",
                   }}
                 >
+                  {reservations.some(
+                    (r) => r.status === "ACCEPTED" || r.status === "REJECTED"
+                  ) && (
+                    <div className="mb-4 d-flex justify-content-end">
+                      <Button
+                        variant="outline-danger"
+                        onClick={handleClearCompleted}
+                        disabled={clearingReservations}
+                        style={{
+                          borderRadius: "20px",
+                          padding: "0.5rem 1.5rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        {clearingReservations ? (
+                          <>
+                            <Spinner animation="border" size="sm" />
+                            Clearing...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-trash"></i>
+                            Clear Completed Reservations
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                   {reservationLoading ? (
                     <div className="text-center py-5">
                       <Spinner
