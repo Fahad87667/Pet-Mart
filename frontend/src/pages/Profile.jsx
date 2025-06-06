@@ -11,6 +11,7 @@ import {
 import { getCurrentUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import * as reservationService from "../services/reservationService";
+import { toast } from "react-toastify";
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -19,7 +20,22 @@ function Profile() {
   const [reservations, setReservations] = useState([]);
   const [reservationLoading, setReservationLoading] = useState(true);
   const [reservationError, setReservationError] = useState(null);
+  const [withdrawingId, setWithdrawingId] = useState(null);
   const navigate = useNavigate();
+
+  const handleWithdraw = async (reservationId) => {
+    try {
+      setWithdrawingId(reservationId);
+      await reservationService.withdrawReservation(reservationId);
+      setReservations(reservations.filter(r => r.id !== reservationId));
+      toast.success("Reservation withdrawn successfully");
+    } catch (error) {
+      console.error("Error withdrawing reservation:", error);
+      toast.error(error.response?.data?.message || "Failed to withdraw reservation");
+    } finally {
+      setWithdrawingId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -509,7 +525,6 @@ function Profile() {
                               padding: "1.25rem",
                               border: "1px solid #e2e8f0",
                               transition: "all 0.3s ease",
-                              cursor: "pointer",
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.transform =
@@ -524,132 +539,149 @@ function Profile() {
                               e.currentTarget.style.boxShadow = "none";
                             }}
                           >
-                            <div className="d-flex justify-content-between align-items-start">
-                              <div className="flex-grow-1">
-                                <div className="d-flex align-items-center mb-2">
-                                  <div
-                                    style={{
-                                      width: "40px",
-                                      height: "40px",
-                                      borderRadius: "12px",
-                                      background:
-                                        "linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%)",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      marginRight: "12px",
-                                      fontSize: "1.5rem",
-                                    }}
-                                  >
-                                    🐾
-                                  </div>
-                                  <div>
-                                    <h6
-                                      className="mb-0"
-                                      style={{
-                                        color: "#1e293b",
-                                        fontWeight: "700",
-                                        fontSize: "1rem",
-                                      }}
-                                    >
-                                      {reservation.petName}
-                                    </h6>
-                                    {reservation.reservedItemsDetails &&
-                                      (() => {
-                                        try {
-                                          const details = JSON.parse(
-                                            reservation.reservedItemsDetails
-                                          );
-                                          if (
-                                            details &&
-                                            details.length > 0 &&
-                                            details[0].product
-                                          ) {
-                                            const product = details[0].product;
-                                            return (
-                                              <span
-                                                style={{
-                                                  color: "#64748b",
-                                                  fontSize: "0.875rem",
-                                                }}
-                                              >
-                                                {product.type} • {product.breed}
-                                              </span>
-                                            );
-                                          }
-                                        } catch (e) {
-                                          console.error(
-                                            "Failed to parse reservedItemsDetails",
-                                            e
-                                          );
-                                        }
-                                        return null;
-                                      })()}
-                                  </div>
-                                </div>
-
-                                <div className="d-flex flex-wrap gap-3 mt-2">
-                                  {reservation.reservationDate && (
-                                    <span
-                                      style={{
-                                        fontSize: "0.8rem",
-                                        color: "#64748b",
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <i
-                                        className="bi bi-calendar3 me-1"
-                                        style={{ color: "#94a3b8" }}
-                                      />
-                                      Reserved:{" "}
-                                      {new Date(
-                                        reservation.reservationDate
-                                      ).toLocaleDateString()}
-                                    </span>
-                                  )}
-                                  {reservation.preferredVisitDate && (
-                                    <span
-                                      style={{
-                                        fontSize: "0.8rem",
-                                        color: "#64748b",
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <i
-                                        className="bi bi-calendar-check me-1"
-                                        style={{ color: "#94a3b8" }}
-                                      />
-                                      Visit:{" "}
-                                      {new Date(
-                                        reservation.preferredVisitDate
-                                      ).toLocaleDateString()}
-                                    </span>
-                                  )}
-                                </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                              }}
+                            >
+                              <div>
+                                <h6
+                                  className="mb-0"
+                                  style={{
+                                    color: "#1e293b",
+                                    fontWeight: "700",
+                                    fontSize: "1rem",
+                                  }}
+                                >
+                                  {reservation.petName}
+                                </h6>
+                                {reservation.reservedItemsDetails &&
+                                  (() => {
+                                    try {
+                                      const details = JSON.parse(
+                                        reservation.reservedItemsDetails
+                                      );
+                                      if (
+                                        details &&
+                                        details.length > 0 &&
+                                        details[0].product
+                                      ) {
+                                        const product = details[0].product;
+                                        return (
+                                          <span
+                                            style={{
+                                              color: "#64748b",
+                                              fontSize: "0.875rem",
+                                            }}
+                                          >
+                                            {product.type} • {product.breed}
+                                          </span>
+                                        );
+                                      }
+                                    } catch (e) {
+                                      console.error(
+                                        "Failed to parse reservedItemsDetails",
+                                        e
+                                      );
+                                    }
+                                    return null;
+                                  })()}
                               </div>
 
-                              <Badge
-                                pill
-                                style={{
-                                  padding: "0.5rem 1rem",
-                                  fontSize: "0.8rem",
-                                  fontWeight: "600",
-                                  background:
-                                    reservation.status === "ACCEPTED"
-                                      ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-                                      : reservation.status === "REJECTED"
-                                      ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
-                                      : reservation.status === "PENDING"
-                                      ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
-                                      : "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)",
-                                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                  border: "none",
-                                }}
-                              >
-                                {reservation.status}
-                              </Badge>
+                              <div className="d-flex align-items-center gap-2">
+                                <Badge
+                                  pill
+                                  style={{
+                                    padding: "0.5rem 1rem",
+                                    fontSize: "0.8rem",
+                                    fontWeight: "600",
+                                    background:
+                                      reservation.status === "ACCEPTED"
+                                        ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                                        : reservation.status === "REJECTED"
+                                        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
+                                        : reservation.status === "PENDING"
+                                        ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                                        : "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)",
+                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                    border: "none",
+                                  }}
+                                >
+                                  {reservation.status}
+                                </Badge>
+                                {reservation.status === "PENDING" && (
+                                  <Button
+                                    variant="warning"
+                                    size="sm"
+                                    onClick={() => handleWithdraw(reservation.id)}
+                                    disabled={withdrawingId === reservation.id}
+                                    style={{
+                                      padding: "0.5rem 1rem",
+                                      fontSize: "0.8rem",
+                                      fontWeight: "600",
+                                      borderRadius: "20px",
+                                      border: "none",
+                                      background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                                      color: "white",
+                                      boxShadow: "0 2px 4px rgba(245, 158, 11, 0.2)",
+                                    }}
+                                  >
+                                    {withdrawingId === reservation.id ? (
+                                      <Spinner
+                                        animation="border"
+                                        size="sm"
+                                        style={{ marginRight: "0.5rem" }}
+                                      />
+                                    ) : (
+                                      <i className="bi bi-x-circle me-1" />
+                                    )}
+                                    Withdraw
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="d-flex flex-wrap gap-3 mt-2">
+                              {reservation.reservationDate && (
+                                <span
+                                  style={{
+                                    fontSize: "0.8rem",
+                                    color: "#64748b",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <i
+                                    className="bi bi-calendar3 me-1"
+                                    style={{ color: "#94a3b8" }}
+                                  />
+                                  Reserved:{" "}
+                                  {new Date(
+                                    reservation.reservationDate
+                                  ).toLocaleDateString()}
+                                </span>
+                              )}
+                              {reservation.preferredVisitDate && (
+                                <span
+                                  style={{
+                                    fontSize: "0.8rem",
+                                    color: "#64748b",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <i
+                                    className="bi bi-calendar-check me-1"
+                                    style={{ color: "#94a3b8" }}
+                                  />
+                                  Visit:{" "}
+                                  {new Date(
+                                    reservation.preferredVisitDate
+                                  ).toLocaleDateString()}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>

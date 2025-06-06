@@ -79,5 +79,10 @@ public class ReservationService {
         return reservationRepository.findByCustomerEmail(customerEmail);
     }
 
+    public void deleteReservation(Long id) {
+        Reservation reservation = getReservationById(id);
+        reservationRepository.delete(reservation);
+    }
+
     // You might want methods to get reservations by status, customer, etc.
 } 

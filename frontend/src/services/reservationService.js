@@ -13,3 +13,13 @@ export const getUserReservations = async () => {
     throw error; // Re-throw the error so the component can handle it
   }
 };
+
+export const withdrawReservation = async (reservationId) => {
+  try {
+    const response = await api.delete(`/reservations/${reservationId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error withdrawing reservation:", error);
+    throw error;
+  }
+};

@@ -231,6 +231,38 @@ public class ApiController {
         }
     }
 
+    @DeleteMapping("/reservations/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> withdrawReservation(@PathVariable Long id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            Reservation reservation = reservationService.getReservationById(id);
+            
+            // Check if the reservation belongs to the current user
+            if (!reservation.getCustomerEmail().equals(userEmail)) {
+                return ResponseEntity.status(403).body("You are not authorized to withdraw this reservation");
+            }
+
+            // Check if the reservation is in PENDING status
+            if (reservation.getStatus() != Reservation.ReservationStatus.PENDING) {
+                return ResponseEntity.badRequest().body("Only pending reservations can be withdrawn");
+            }
+
+            // Delete the reservation
+            reservationService.deleteReservation(id);
+
+            return ResponseEntity.ok().body("Reservation withdrawn successfully");
+        } catch (Exception e) {
+            logger.error("Error withdrawing reservation", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to withdraw reservation");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
     @GetMapping("/products")
     public ResponseEntity<?> getProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
