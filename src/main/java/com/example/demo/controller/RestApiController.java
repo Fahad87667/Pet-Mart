@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Product;
+import com.example.demo.entity.Reservation;
 import com.example.demo.model.CartInfo;
 import com.example.demo.model.CartLineInfo;
 import com.example.demo.model.CustomerInfo;
@@ -15,6 +16,7 @@ import com.example.demo.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +60,7 @@ public class RestApiController {
 
     @PostMapping("/reservations")
     @PreAuthorize("isAuthenticated()") // Ensure user is authenticated
+    @Transactional
     public ResponseEntity<?> createReservation(
             HttpServletRequest request,
             @Valid @RequestBody CustomerInfo customerInfo) {
@@ -69,18 +72,17 @@ public class RestApiController {
                 return ResponseEntity.badRequest().body("Cart is empty. Cannot create a reservation.");
             }
 
-            // Use the service to create the reservation
-            reservationService.createReservationFromCart(cartInfo, customerInfo);
-
-            // Clear the cart after successful reservation
+            // Create reservation and clear cart in the same transaction
+            Reservation reservation = reservationService.createReservationFromCart(cartInfo, customerInfo);
             cartService.removeCartInSession(request);
 
-            // You might want to return the created reservation details or a simple success message
-            return ResponseEntity.ok().body("Reservation created successfully.");
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Reservation created successfully");
+            response.put("reservation", reservation);
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            // Log the exception for debugging
-            e.printStackTrace();
+            logger.error("Error creating reservation", e);
             return ResponseEntity.internalServerError().body("Error creating reservation: " + e.getMessage());
         }
     }

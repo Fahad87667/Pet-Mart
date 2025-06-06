@@ -496,191 +496,198 @@ function Admin({ isAdmin, isLoggedIn }) {
 
                 <div className="table-responsive">
                   {reservations.length > 0 ? (
-                    <Table hover className="reservation-table">
-                      <thead>
-                        <tr>
-                          <th>Reservation Details</th>
-                          <th>Customer Information</th>
-                          <th>Pet Details</th>
-                          <th>Visit Date</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {reservations.map((reservation) => (
-                          <tr key={`reservation-${reservation.id}`}>
-                            <td>
-                              <div className="reservation-info">
-                                <div className="reservation-header">
-                                  <span className="reservation-id">
-                                    #{reservation.id}
-                                  </span>
-                                  <span className="reservation-date">
+                    <div style={{ 
+                      maxHeight: "600px", 
+                      overflowY: "auto",
+                      border: "1px solid #e9ecef",
+                      borderRadius: "8px"
+                    }}>
+                      <Table hover className="reservation-table">
+                        <thead style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "#f8f9fa" }}>
+                          <tr>
+                            <th>Reservation Details</th>
+                            <th>Customer Information</th>
+                            <th>Pet Details</th>
+                            <th>Visit Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reservations.map((reservation) => (
+                            <tr key={`reservation-${reservation.id}`}>
+                              <td>
+                                <div className="reservation-info">
+                                  <div className="reservation-header">
+                                    <span className="reservation-id">
+                                      #{reservation.id}
+                                    </span>
+                                    <span className="reservation-date">
+                                      {new Date(
+                                        reservation.reservationDate
+                                      ).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                  </div>
+                                  {reservation.message && (
+                                    <div className="message-box">
+                                      <div className="message-header">
+                                        <i className="bi bi-chat-left-text"></i>
+                                        <strong>Customer Message</strong>
+                                      </div>
+                                      <p>{reservation.message}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              <td>
+                                <div className="customer-info">
+                                  <div className="customer-header">
+                                    <i className="bi bi-person-circle"></i>
+                                    <strong>{reservation.customerName}</strong>
+                                  </div>
+                                  <div className="customer-details">
+                                    <div className="detail-item">
+                                      <i className="bi bi-envelope"></i>
+                                      <span>{reservation.customerEmail}</span>
+                                    </div>
+                                    <div className="detail-item">
+                                      <i className="bi bi-telephone"></i>
+                                      <span>{reservation.customerPhone}</span>
+                                    </div>
+                                    {reservation.customerAddress &&
+                                      reservation.customerAddress !== "N/A" && (
+                                        <div className="detail-item">
+                                          <i className="bi bi-geo-alt"></i>
+                                          <span>
+                                            {reservation.customerAddress}
+                                          </span>
+                                        </div>
+                                      )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                {reservation.reservedItemsDetails &&
+                                  JSON.parse(
+                                    reservation.reservedItemsDetails
+                                  ).map((item, idx) => (
+                                    <div
+                                      key={`item-${reservation.id}-${idx}`}
+                                      className="pet-item"
+                                    >
+                                      <div className="pet-image">
+                                        <img
+                                          src={
+                                            item.productInfo.imagePath
+                                              ? `http://localhost:8080${item.productInfo.imagePath}`
+                                              : "https://via.placeholder.com/40"
+                                          }
+                                          alt={item.productInfo.name}
+                                        />
+                                      </div>
+                                      <div className="pet-details">
+                                        <div className="pet-name">
+                                          <span>{item.productInfo.name}</span>
+                                          <Badge
+                                            bg={getTypeBadgeColor(
+                                              item.productInfo.type
+                                            )}
+                                          >
+                                            {item.productInfo.type}
+                                          </Badge>
+                                        </div>
+                                        <div className="pet-info">
+                                          <span className="breed">
+                                            {item.productInfo.breed}
+                                          </span>
+                                          <span className="age">
+                                            {item.productInfo.age}
+                                          </span>
+                                        </div>
+                                        <div className="pet-price">
+                                          <span className="amount">
+                                            ₹{item.amount.toFixed(2)}
+                                          </span>
+                                          <span className="quantity">
+                                            Qty: {item.quantity}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                              </td>
+                              <td>
+                                <div className="visit-date">
+                                  <i className="bi bi-calendar-check"></i>
+                                  <span>
                                     {new Date(
-                                      reservation.reservationDate
+                                      reservation.preferredVisitDate
                                     ).toLocaleDateString("en-US", {
+                                      weekday: "short",
                                       year: "numeric",
                                       month: "short",
                                       day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
                                     })}
                                   </span>
                                 </div>
-                                {reservation.message && (
-                                  <div className="message-box">
-                                    <div className="message-header">
-                                      <i className="bi bi-chat-left-text"></i>
-                                      <strong>Customer Message</strong>
-                                    </div>
-                                    <p>{reservation.message}</p>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td>
-                              <div className="customer-info">
-                                <div className="customer-header">
-                                  <i className="bi bi-person-circle"></i>
-                                  <strong>{reservation.customerName}</strong>
-                                </div>
-                                <div className="customer-details">
-                                  <div className="detail-item">
-                                    <i className="bi bi-envelope"></i>
-                                    <span>{reservation.customerEmail}</span>
-                                  </div>
-                                  <div className="detail-item">
-                                    <i className="bi bi-telephone"></i>
-                                    <span>{reservation.customerPhone}</span>
-                                  </div>
-                                  {reservation.customerAddress &&
-                                    reservation.customerAddress !== "N/A" && (
-                                      <div className="detail-item">
-                                        <i className="bi bi-geo-alt"></i>
-                                        <span>
-                                          {reservation.customerAddress}
-                                        </span>
-                                      </div>
-                                    )}
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              {reservation.reservedItemsDetails &&
-                                JSON.parse(
-                                  reservation.reservedItemsDetails
-                                ).map((item, idx) => (
-                                  <div
-                                    key={`item-${reservation.id}-${idx}`}
-                                    className="pet-item"
-                                  >
-                                    <div className="pet-image">
-                                      <img
-                                        src={
-                                          item.productInfo.imagePath
-                                            ? `http://localhost:8080${item.productInfo.imagePath}`
-                                            : "https://via.placeholder.com/40"
+                              </td>
+                              <td>
+                                <Badge
+                                  bg={getStatusColor(reservation.status)}
+                                  className="status-badge"
+                                >
+                                  {reservation.status.toLowerCase()}
+                                </Badge>
+                              </td>
+                              <td>
+                                <div className="action-buttons">
+                                  {reservation.status === "PENDING" && (
+                                    <>
+                                      <Button
+                                        variant="success"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleReservationStatus(
+                                            reservation.id,
+                                            "ACCEPTED"
+                                          )
                                         }
-                                        alt={item.productInfo.name}
-                                      />
-                                    </div>
-                                    <div className="pet-details">
-                                      <div className="pet-name">
-                                        <span>{item.productInfo.name}</span>
-                                        <Badge
-                                          bg={getTypeBadgeColor(
-                                            item.productInfo.type
-                                          )}
-                                        >
-                                          {item.productInfo.type}
-                                        </Badge>
-                                      </div>
-                                      <div className="pet-info">
-                                        <span className="breed">
-                                          {item.productInfo.breed}
-                                        </span>
-                                        <span className="age">
-                                          {item.productInfo.age}
-                                        </span>
-                                      </div>
-                                      <div className="pet-price">
-                                        <span className="amount">
-                                          ₹{item.amount.toFixed(2)}
-                                        </span>
-                                        <span className="quantity">
-                                          Qty: {item.quantity}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                            </td>
-                            <td>
-                              <div className="visit-date">
-                                <i className="bi bi-calendar-check"></i>
-                                <span>
-                                  {new Date(
-                                    reservation.preferredVisitDate
-                                  ).toLocaleDateString("en-US", {
-                                    weekday: "short",
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <Badge
-                                bg={getStatusColor(reservation.status)}
-                                className="status-badge"
-                              >
-                                {reservation.status.toLowerCase()}
-                              </Badge>
-                            </td>
-                            <td>
-                              <div className="action-buttons">
-                                {reservation.status === "PENDING" && (
-                                  <>
-                                    <Button
-                                      variant="success"
-                                      size="sm"
-                                      onClick={() =>
-                                        handleReservationStatus(
-                                          reservation.id,
-                                          "ACCEPTED"
-                                        )
-                                      }
-                                      disabled={resLoading}
-                                      className="action-button"
-                                    >
-                                      <i className="bi bi-check-circle"></i>
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      variant="danger"
-                                      size="sm"
-                                      onClick={() =>
-                                        handleReservationStatus(
-                                          reservation.id,
-                                          "REJECTED"
-                                        )
-                                      }
-                                      disabled={resLoading}
-                                      className="action-button"
-                                    >
-                                      <i className="bi bi-x-circle"></i>
-                                      Reject
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+                                        disabled={resLoading}
+                                        className="action-button"
+                                      >
+                                        <i className="bi bi-check-circle"></i>
+                                        Accept
+                                      </Button>
+                                      <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleReservationStatus(
+                                            reservation.id,
+                                            "REJECTED"
+                                          )
+                                        }
+                                        disabled={resLoading}
+                                        className="action-button"
+                                      >
+                                        <i className="bi bi-x-circle"></i>
+                                        Reject
+                                      </Button>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </div>
                   ) : resLoading ? (
                     <div className="text-center py-5">
                       <Spinner animation="border" />
@@ -970,11 +977,34 @@ const styles = `
     border-bottom: 2px solid #e9ecef;
     padding: 12px;
     font-weight: 600;
+    white-space: nowrap;
   }
 
   .reservation-table td {
     padding: 16px;
     vertical-align: top;
+  }
+
+  .reservation-table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .reservation-table::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .reservation-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .reservation-table::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .reservation-table::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 
   .reservation-info {

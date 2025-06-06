@@ -71,8 +71,8 @@ function Header({
   };
 
   const brandLogoStyle = {
-    width: "45px",
-    height: "45px",
+    width: "65px",
+    height: "65px",
     background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
     borderRadius: "12px",
     display: "flex",
@@ -80,10 +80,11 @@ function Header({
     justifyContent: "center",
     boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
     transition: "transform 0.3s ease",
+    overflow: "hidden"
   };
 
   const brandTextStyle = {
-    fontSize: "1.5rem",
+    fontSize: "1.8rem",
     fontWeight: "700",
     background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
     WebkitBackgroundClip: "text",
@@ -214,7 +215,16 @@ function Header({
                 e.target.style.transform = "rotate(0deg) scale(1)";
               }}
             >
-              🐾
+              <img 
+                src="/images/logo.jpg" 
+                alt="Pet-Mart Logo" 
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  padding: "8px"
+                }}
+              />
             </div>
             <span style={brandTextStyle}>Pet-Mart</span>
           </Navbar.Brand>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -12,6 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../services/api";
 import { cartService } from "../services/cartService";
+import { getCurrentUser } from "../services/authService";
 
 function Checkout({ onAddToCartSuccess }) {
   const location = useLocation();
@@ -27,14 +28,99 @@ function Checkout({ onAddToCartSuccess }) {
     agreeToTerms: false,
   });
 
+  const [errors, setErrors] = useState({});
   const [validated, setValidated] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getCurrentUser();
+        if (userData) {
+          setFormData(prev => ({
+            ...prev,
+            fullName: `${userData.firstName} ${userData.lastName}`.trim(),
+            email: userData.email
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   if (!cart || !cart.cartLines || cart.cartLines.length === 0) {
     navigate("/cart");
     return null;
   }
+
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    // Name validation
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+      isValid = false;
+    } else if (!/^[a-zA-Z\s]{2,50}$/.test(formData.fullName)) {
+      newErrors.fullName = "Name must be 2-50 characters and contain only letters and spaces";
+      isValid = false;
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    } else if (formData.email.length > 100) {
+      newErrors.email = "Email must be less than 100 characters";
+      isValid = false;
+    }
+
+    // Phone validation
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+      isValid = false;
+    } else if (!/^[8-9]\d{9}$/.test(formData.phone)) {
+      newErrors.phone = "Phone must be 10 digits starting with 8 or 9";
+      isValid = false;
+    }
+
+    // Date validation
+    if (!formData.preferredDate) {
+      newErrors.preferredDate = "Preferred date is required";
+      isValid = false;
+    } else {
+      const selectedDate = new Date(formData.preferredDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (selectedDate < today) {
+        newErrors.preferredDate = "Please select a future date";
+        isValid = false;
+      }
+    }
+
+    // Message validation (optional)
+    if (formData.message && formData.message.length > 500) {
+      newErrors.message = "Message must be less than 500 characters";
+      isValid = false;
+    }
+
+    // Terms validation
+    if (!formData.agreeToTerms) {
+      newErrors.agreeToTerms = "You must agree to the terms";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -42,19 +128,24 @@ function Checkout({ onAddToCartSuccess }) {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: null
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = e.currentTarget;
-
-    if (form.checkValidity() === false) {
-      e.stopPropagation();
+    
+    if (!validateForm()) {
       setValidated(true);
       return;
     }
 
-    setValidated(false); // Reset validation state on successful check
+    setValidated(false);
     setSubmitting(true);
     setSubmissionError(null);
 
@@ -223,11 +314,18 @@ function Checkout({ onAddToCartSuccess }) {
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      placeholder="Enter your full name"
-                      style={{ borderRadius: "10px" }}
+                      placeholder="Enter your full name (2-50 characters)"
+                      minLength={2}
+                      maxLength={50}
+                      readOnly
+                      style={{ 
+                        borderRadius: "10px",
+                        borderColor: errors.fullName ? "#dc3545" : undefined,
+                        backgroundColor: "#f8f9fa"
+                      }}
                     />
                     <Form.Control.Feedback type="invalid">
-                      Please provide your name.
+                      {errors.fullName || "Please provide your name."}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
@@ -244,27 +342,37 @@ function Checkout({ onAddToCartSuccess }) {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="your@email.com"
-                      style={{ borderRadius: "10px" }}
+                      maxLength={100}
+                      readOnly
+                      style={{ 
+                        borderRadius: "10px",
+                        borderColor: errors.email ? "#dc3545" : undefined,
+                        backgroundColor: "#f8f9fa"
+                      }}
                     />
                     <Form.Control.Feedback type="invalid">
-                      Please provide a valid email.
+                      {errors.email || "Please provide a valid email."}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Label>Phone</Form.Label>
                     <Form.Control
                       required
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="(123) 456-7890"
-                      style={{ borderRadius: "10px" }}
+                      placeholder="8XXXXXXXXX or 9XXXXXXXXX"
+                      pattern="[89]\d{9}"
+                      style={{ 
+                        borderRadius: "10px",
+                        borderColor: errors.phone ? "#dc3545" : undefined
+                      }}
                     />
                     <Form.Control.Feedback type="invalid">
-                      Please provide your phone number.
+                      {errors.phone || "Please provide a valid phone number."}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
@@ -279,10 +387,13 @@ function Checkout({ onAddToCartSuccess }) {
                   value={formData.preferredDate}
                   onChange={handleInputChange}
                   min={new Date().toISOString().split("T")[0]}
-                  style={{ borderRadius: "10px" }}
+                  style={{ 
+                    borderRadius: "10px",
+                    borderColor: errors.preferredDate ? "#dc3545" : undefined
+                  }}
                 />
                 <Form.Control.Feedback type="invalid">
-                  Please select a visit date.
+                  {errors.preferredDate || "Please select a visit date."}
                 </Form.Control.Feedback>
               </Form.Group>
 
@@ -294,9 +405,18 @@ function Checkout({ onAddToCartSuccess }) {
                   name="message"
                   value={formData.message}
                   onChange={handleInputChange}
-                  placeholder="Tell us anything else you'd like us to know..."
-                  style={{ borderRadius: "10px" }}
+                  placeholder="Tell us anything else you'd like us to know... (max 500 characters)"
+                  maxLength={500}
+                  style={{ 
+                    borderRadius: "10px",
+                    borderColor: errors.message ? "#dc3545" : undefined
+                  }}
                 />
+                {errors.message && (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.message}
+                  </Form.Control.Feedback>
+                )}
               </Form.Group>
 
               <Alert
@@ -315,8 +435,9 @@ function Checkout({ onAddToCartSuccess }) {
                   checked={formData.agreeToTerms}
                   onChange={handleInputChange}
                   label="I understand this is a reservation request and agree to be contacted"
-                  feedback="You must agree before submitting."
+                  feedback={errors.agreeToTerms || "You must agree before submitting."}
                   feedbackType="invalid"
+                  isInvalid={!!errors.agreeToTerms}
                 />
               </Form.Group>
 

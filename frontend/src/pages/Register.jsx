@@ -27,7 +27,7 @@ function Register({ updateAuthState }) {
     confirmPassword: "",
     secretKey: "",
   });
-  const [userType, setUserType] = useState("user"); // 'user' or 'admin'
+  const [userType, setUserType] = useState("user");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -51,11 +51,29 @@ function Register({ updateAuthState }) {
     if (!formData.firstName.trim()) {
       errors.firstName = "First name is required";
       isValid = false;
+    } else if (formData.firstName.length < 2) {
+      errors.firstName = "First name must be at least 2 characters";
+      isValid = false;
+    } else if (formData.firstName.length > 50) {
+      errors.firstName = "First name must not exceed 50 characters";
+      isValid = false;
+    } else if (!/^[a-zA-Z\s]*$/.test(formData.firstName)) {
+      errors.firstName = "First name can only contain letters and spaces";
+      isValid = false;
     }
 
     // Last Name validation
     if (!formData.lastName.trim()) {
       errors.lastName = "Last name is required";
+      isValid = false;
+    } else if (formData.lastName.length < 2) {
+      errors.lastName = "Last name must be at least 2 characters";
+      isValid = false;
+    } else if (formData.lastName.length > 50) {
+      errors.lastName = "Last name must not exceed 50 characters";
+      isValid = false;
+    } else if (!/^[a-zA-Z\s]*$/.test(formData.lastName)) {
+      errors.lastName = "Last name can only contain letters and spaces";
       isValid = false;
     }
 
@@ -63,16 +81,22 @@ function Register({ updateAuthState }) {
     if (!formData.email.trim()) {
       errors.email = "Email is required";
       isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Please enter a valid email address";
-      isValid = false;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.email = "Please enter a valid email address";
+        isValid = false;
+      } else if (formData.email.length > 100) {
+        errors.email = "Email must not exceed 100 characters";
+        isValid = false;
+      }
     }
 
     // Phone validation
     if (!formData.phone.trim()) {
       errors.phone = "Phone number is required";
       isValid = false;
-    } else if (!/^[89]\d{9}$/.test(formData.phone)) {
+    } else if (!/^[8-9]\d{9}$/.test(formData.phone)) {
       errors.phone = "Phone must be 10 digits starting with 8 or 9";
       isValid = false;
     }
@@ -84,13 +108,20 @@ function Register({ updateAuthState }) {
     } else if (formData.password.length < 8) {
       errors.password = "Password must be at least 8 characters";
       isValid = false;
-    } else if (
-      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
-        formData.password
-      )
-    ) {
-      errors.password =
-        "Password must contain uppercase, lowercase, number and special character";
+    } else if (formData.password.length > 50) {
+      errors.password = "Password must not exceed 50 characters";
+      isValid = false;
+    } else if (!/(?=.*[a-z])/.test(formData.password)) {
+      errors.password = "Password must contain at least one lowercase letter";
+      isValid = false;
+    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+      errors.password = "Password must contain at least one uppercase letter";
+      isValid = false;
+    } else if (!/(?=.*\d)/.test(formData.password)) {
+      errors.password = "Password must contain at least one number";
+      isValid = false;
+    } else if (!/(?=.*[@$!%*?&])/.test(formData.password)) {
+      errors.password = "Password must contain at least one special character (@$!%*?&)";
       isValid = false;
     }
 
@@ -104,15 +135,14 @@ function Register({ updateAuthState }) {
     }
 
     // Secret Key validation (only for admin)
-    if (userType === "admin" && !formData.secretKey.trim()) {
-      errors.secretKey = "Secret key is required for admin registration";
-      isValid = false;
-    } else if (
-      userType === "admin" &&
-      formData.secretKey.trim() !== "ADMIN123"
-    ) {
-      errors.secretKey = "Invalid secret key";
-      isValid = false;
+    if (userType === "admin") {
+      if (!formData.secretKey.trim()) {
+        errors.secretKey = "Secret key is required for admin registration";
+        isValid = false;
+      } else if (formData.secretKey.trim() !== "ADMIN123") {
+        errors.secretKey = "Invalid secret key";
+        isValid = false;
+      }
     }
 
     setValidationErrors(errors);
@@ -184,7 +214,6 @@ function Register({ updateAuthState }) {
     // Clear secret key when switching user types
     setFormData({ ...formData, secretKey: "" });
     setValidationErrors({ ...validationErrors, secretKey: "" });
-    console.log("User type set to:", val); // Log the user type for debugging
   };
 
   const styles = {
@@ -311,7 +340,7 @@ function Register({ updateAuthState }) {
             </ToggleButton>
           </ToggleButtonGroup>
 
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} noValidate>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
@@ -329,6 +358,9 @@ function Register({ updateAuthState }) {
                     }}
                     isInvalid={!!validationErrors.firstName}
                     required
+                    minLength={2}
+                    maxLength={50}
+                    placeholder="Enter your first name"
                   />
                   {validationErrors.firstName && (
                     <Form.Text style={styles.errorText}>
@@ -353,6 +385,9 @@ function Register({ updateAuthState }) {
                     }}
                     isInvalid={!!validationErrors.lastName}
                     required
+                    minLength={2}
+                    maxLength={50}
+                    placeholder="Enter your last name"
                   />
                   {validationErrors.lastName && (
                     <Form.Text style={styles.errorText}>
@@ -378,6 +413,8 @@ function Register({ updateAuthState }) {
                 }}
                 isInvalid={!!validationErrors.email}
                 required
+                maxLength={100}
+                placeholder="example@gmail.com"
               />
               {validationErrors.email && (
                 <Form.Text style={styles.errorText}>
@@ -402,6 +439,7 @@ function Register({ updateAuthState }) {
                 isInvalid={!!validationErrors.phone}
                 required
                 maxLength="10"
+                placeholder="e.g. 9876543210"
               />
               {validationErrors.phone && (
                 <Form.Text style={styles.errorText}>
@@ -466,6 +504,9 @@ function Register({ updateAuthState }) {
                       }}
                       isInvalid={!!validationErrors.password}
                       required
+                      minLength={8}
+                      maxLength={50}
+                      placeholder="Enter your password"
                     />
                     <InputGroup.Text
                       style={styles.passwordToggle}
@@ -479,11 +520,8 @@ function Register({ updateAuthState }) {
                       {validationErrors.password}
                     </Form.Text>
                   ) : (
-                    <Form.Text
-                      style={{ color: "#6b7280", fontSize: "0.875rem" }}
-                    >
-                      Must contain: uppercase, lowercase, number, special
-                      character
+                    <Form.Text style={{ color: "#6b7280", fontSize: "0.875rem" }}>
+                      Must contain: uppercase, lowercase, number, special character
                     </Form.Text>
                   )}
                 </Form.Group>
@@ -501,11 +539,13 @@ function Register({ updateAuthState }) {
                       onChange={handleChange}
                       style={{
                         ...styles.input,
-                        ...(validationErrors.confirmPassword &&
-                          styles.inputError),
+                        ...(validationErrors.confirmPassword && styles.inputError),
                       }}
                       isInvalid={!!validationErrors.confirmPassword}
                       required
+                      minLength={8}
+                      maxLength={50}
+                      placeholder="Confirm your password"
                     />
                     <InputGroup.Text
                       style={styles.passwordToggle}
@@ -530,36 +570,34 @@ function Register({ updateAuthState }) {
               onMouseEnter={(e) => {
                 if (!loading) {
                   e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow =
-                    "0 8px 25px rgba(99, 102, 241, 0.4)";
+                  e.target.style.boxShadow = "0 8px 25px rgba(99, 102, 241, 0.4)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!loading) {
                   e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow =
-                    "0 6px 20px rgba(99, 102, 241, 0.3)";
+                  e.target.style.boxShadow = "0 6px 20px rgba(99, 102, 241, 0.3)";
                 }
               }}
             >
               {loading ? "Signing Up..." : "Sign Up"}
             </Button>
-          </Form>
 
-          <div className="text-center mt-4">
-            <span style={{ color: "#6b7280" }}>Already have an account? </span>
-            <a
-              onClick={() => navigate("/signin")}
-              style={{
-                color: "#6366f1",
-                textDecoration: "none",
-                fontWeight: "500",
-                cursor: "pointer",
-              }}
-            >
-              Sign in
-            </a>
-          </div>
+            <div className="text-center mt-4">
+              <span style={{ color: "#6b7280" }}>Already have an account? </span>
+              <a
+                onClick={() => navigate("/signin")}
+                style={{
+                  color: "#6366f1",
+                  textDecoration: "none",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                }}
+              >
+                Sign in
+              </a>
+            </div>
+          </Form>
         </Card>
       </Container>
     </div>

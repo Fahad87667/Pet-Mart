@@ -5,25 +5,28 @@ import { useNavigate } from "react-router-dom";
 function About() {
   const teamMembers = [
     {
-      name: "Sarah Chen",
-      role: "Full Stack Developer",
-      bio: "With over 5 years of experience in React and Node.js, Sarah led the technical architecture and backend development. She's passionate about creating scalable solutions and clean code.",
-      skills: ["React", "Node.js", "PostgreSQL", "AWS"],
-      icon: "💻",
-    },
-    {
-      name: "Marcus Rodriguez",
+      name: "Fahad Khan",
       role: "UI/UX Designer",
-      bio: "Marcus brought the vision to life with his expertise in user experience design. He crafted every pixel with care, ensuring our application is both beautiful and intuitive.",
-      skills: ["Figma", "User Research", "Prototyping", "Design Systems"],
+      bio: "With over 5 years of experience in React and Node.js, Fahad led the technical architecture and backend development. He's passionate about creating scalable solutions and clean code.",
+      skills: ["React", "Node.js", "MYSQL", "AWS", "Prototyping", "Design Systems", "Git and GitHub"],
       icon: "🎨",
+      image: "./public/images/fahad.jpg"
     },
     {
-      name: "Emily Thompson",
+      name: "Mohammad Saif",
+      role: "Full Stack Developer",
+      bio: "Saif is a passionate full-stack developer with hands-on experience in building responsive web applications using Spring Boot and React. He specializes in developing clean RESTful APIs, scalable backend systems with Java and MySQL, and dynamic user interfaces using React.js. With a strong understanding of both frontend and backend technologies, Saif enjoys creating seamless, user-focused applications backed by robust architecture.",
+      skills: ["Java", "Spring Boot", "RESTful API Development", "MySQL or PostgreSQL", "React.js", "JavaScript (ES6+)", "HTML5 & CSS3", "Git and GitHub"],
+      icon: "💻",
+      image: "./public/images/saif.jpg"
+    },
+    {
+      name: "Sumayya Khan",
       role: "Product Manager",
       bio: "Emily coordinated the entire project from concept to launch. Her strategic thinking and attention to detail kept the team focused on delivering real value to users.",
       skills: ["Strategy", "Analytics", "Agile", "User Stories"],
       icon: "⚡",
+      image: "./public/images/sumayya.jpg"
     },
   ];
 
@@ -82,16 +85,17 @@ function About() {
       transition: "all 0.3s ease",
     },
     memberIcon: {
-      width: "60px",
-      height: "60px",
-      background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-      borderRadius: "15px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "1.5rem",
-      boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
+      width: "80px",
+      height: "80px",
+      borderRadius: "50%",
+      overflow: "hidden",
       marginRight: "1rem",
+      boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
+    },
+    memberImage: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
     },
     memberName: {
       fontSize: "1.3rem",
@@ -227,7 +231,9 @@ function About() {
                 >
                   <Card.Body>
                     <div className="d-flex align-items-center mb-4">
-                      <div style={styles.memberIcon}>{member.icon}</div>
+                      <div style={styles.memberIcon}>
+                        <img src={member.image} alt={member.name} style={styles.memberImage} />
+                      </div>
                       <div>
                         <h3 style={styles.memberName}>{member.name}</h3>
                         <p style={styles.memberRole}>{member.role}</p>

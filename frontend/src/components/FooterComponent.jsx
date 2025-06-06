@@ -131,29 +131,47 @@ function Footer() {
                   <i className="bi bi-geo-alt me-2"></i>
                   123 Pet Street, City, State 12345
                 </li>
-                <li className="mb-2">
-                  <Link
-                    to="/contact"
-                    className="text-white text-decoration-none"
-                    style={{ opacity: 0.85 }}
-                  >
-                    <i className="bi bi-telephone me-2"></i>
-                    1-800-PET-MART
-                  </Link>
+                <li className="mb-2" style={{ opacity: 0.85 }}>
+                  <i className="bi bi-telephone me-2"></i>
+                  1-800-PET-MART
                 </li>
-                <li className="mb-2">
-                  <Link
-                    to="/contact"
-                    className="text-white text-decoration-none"
-                    style={{ opacity: 0.85 }}
-                  >
-                    <i className="bi bi-envelope me-2"></i>
-                    support@pet-mart.com
-                  </Link>
+                <li className="mb-2" style={{ opacity: 0.85 }}>
+                  <i className="bi bi-envelope me-2"></i>
+                  support@pet-mart.com
                 </li>
                 <li style={{ opacity: 0.85 }}>
                   <i className="bi bi-clock me-2"></i>
                   Mon-Fri: 9AM-6PM
+                </li>
+                <li className="mt-3">
+                  <Link
+                    to="/contact"
+                    className="btn btn-light"
+                    style={{
+                      background: "white",
+                      color: "#6366f1",
+                      border: "none",
+                      padding: "8px 20px",
+                      borderRadius: "8px",
+                      fontWeight: "600",
+                      transition: "all 0.3s ease",
+                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px"
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow = "0 4px 10px rgba(0,0,0,0.15)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.transform = "translateY(0)";
+                      e.target.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+                    }}
+                  >
+                    <i className="bi bi-chat-dots"></i>
+                    Contact Us
+                  </Link>
                 </li>
               </ul>
             </div>

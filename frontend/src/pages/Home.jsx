@@ -18,16 +18,19 @@ function Home() {
       text: "Amazing service and happy pets! Highly recommend.",
       author: "Mrunali Jangam",
       rating: 5,
+      image: "./public/images/devi.jpg"
     },
     {
       text: "Found my perfect companion thanks to Pet-Mart.",
-      author: "Mukta",
+      author: "Mohammad Saif",
       rating: 5,
+      image: "./public/images/saif.jpg"
     },
     {
       text: "Excellent variety and great customer support.",
-      author: "Mihir",
+      author: "Mohammad Anas",
       rating: 5,
+      image: "./public/images/anas.jpg"
     },
   ];
 
@@ -392,20 +395,23 @@ function Home() {
                   >
                     <div
                       style={{
-                        width: "40px",
-                        height: "40px",
+                        width: "80px",
+                        height: "80px",
                         borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-                        color: "white",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "600",
-                        marginRight: "1rem",
+                        overflow: "hidden",
+                        marginRight: "1.5rem",
+                        boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
                       }}
                     >
-                      {item.author.charAt(0)}
+                      <img
+                        src={item.image}
+                        alt={item.author}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
                     </div>
                     <span
                       style={{
