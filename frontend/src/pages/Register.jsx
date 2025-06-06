@@ -14,8 +14,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { register } from "../services/authService";
 import { FaEye, FaEyeSlash, FaUser, FaUserShield } from "react-icons/fa";
+import { toast } from "react-toastify";
 
-function Register() {
+function Register({ updateAuthState }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -106,7 +107,10 @@ function Register() {
     if (userType === "admin" && !formData.secretKey.trim()) {
       errors.secretKey = "Secret key is required for admin registration";
       isValid = false;
-    } else if (userType === "admin" && formData.secretKey.trim() !== "ADMIN123") {
+    } else if (
+      userType === "admin" &&
+      formData.secretKey.trim() !== "ADMIN123"
+    ) {
       errors.secretKey = "Invalid secret key";
       isValid = false;
     }
@@ -117,24 +121,32 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
     if (!validateForm()) {
       return;
     }
 
+    setError("");
     setLoading(true);
 
     try {
-      const { confirmPassword, secretKey, ...registrationData } = formData;
-      const dataToSend = {
-        ...registrationData,
-        role: userType, // Include the user type in registration data
-        secretKey: formData.secretKey // Include the secret key in the data sent
+      const userData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        role: userType === "admin" ? "ADMIN" : "USER",
+        secretKey: formData.secretKey,
       };
-      console.log(dataToSend);
-      await register(dataToSend);
-      navigate("/signin");
+
+      const user = await register(userData);
+      if (user) {
+        updateAuthState(user);
+        toast.success("Registered successfully!", {
+          autoClose: 1000,
+        });
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message || "An error occurred during registration");
     } finally {
@@ -145,7 +157,7 @@ function Register() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
       setValidationErrors({
@@ -172,7 +184,7 @@ function Register() {
     // Clear secret key when switching user types
     setFormData({ ...formData, secretKey: "" });
     setValidationErrors({ ...validationErrors, secretKey: "" });
-    console.log('User type set to:', val); // Log the user type for debugging
+    console.log("User type set to:", val); // Log the user type for debugging
   };
 
   const styles = {
@@ -467,8 +479,11 @@ function Register() {
                       {validationErrors.password}
                     </Form.Text>
                   ) : (
-                    <Form.Text style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                      Must contain: uppercase, lowercase, number, special character
+                    <Form.Text
+                      style={{ color: "#6b7280", fontSize: "0.875rem" }}
+                    >
+                      Must contain: uppercase, lowercase, number, special
+                      character
                     </Form.Text>
                   )}
                 </Form.Group>
@@ -486,7 +501,8 @@ function Register() {
                       onChange={handleChange}
                       style={{
                         ...styles.input,
-                        ...(validationErrors.confirmPassword && styles.inputError),
+                        ...(validationErrors.confirmPassword &&
+                          styles.inputError),
                       }}
                       isInvalid={!!validationErrors.confirmPassword}
                       required

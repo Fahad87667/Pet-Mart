@@ -53,10 +53,14 @@ function Cart({ onAddToCartSuccess }) {
       if (onAddToCartSuccess) {
         onAddToCartSuccess(updatedCart);
       }
-      toast.success("Cart updated successfully!");
+      toast.success("Cart updated successfully!", {
+        autoClose: 1000,
+      });
     } catch (err) {
       console.error("Error updating quantity:", err);
-      toast.error("Failed to update item quantity.");
+      toast.error("Failed to update item quantity.", {
+        autoClose: 1000,
+      });
       setError(err.message || "Failed to update item quantity.");
     }
   };
@@ -68,14 +72,20 @@ function Cart({ onAddToCartSuccess }) {
       if (onAddToCartSuccess) {
         onAddToCartSuccess(updatedCart);
       }
-      toast.success("Pet removed from adoption list!");
+      toast.error("Pet removed from adoption list!", {
+        autoClose: 1000,
+      });
     } catch (err) {
       console.error("Error removing item:", err);
       if (err.message === "AUTHENTICATION_REQUIRED") {
-        toast.error("Please sign in to manage your adoption list");
+        toast.error("Please sign in to manage your adoption list", {
+          autoClose: 1000,
+        });
         navigate("/signin");
       } else {
-        toast.error("Failed to remove pet from list.");
+        toast.error("Failed to remove pet from list.", {
+          autoClose: 1000,
+        });
         setError(err.message || "Failed to remove pet from list.");
       }
     }

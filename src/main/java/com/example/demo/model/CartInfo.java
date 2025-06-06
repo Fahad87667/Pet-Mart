@@ -122,7 +122,7 @@ public class CartInfo {
     }
 
     public boolean isEmpty() {
-        return this.cartLines.isEmpty();
+        return cartLines == null || cartLines.isEmpty();
     }
 
     public boolean isValidCustomer() {

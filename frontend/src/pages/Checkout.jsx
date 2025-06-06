@@ -86,11 +86,14 @@ function Checkout({ onAddToCartSuccess }) {
 
         // Reservation created successfully
         toast.success(
-          "Reservation submitted successfully! We'll contact you soon."
+          "Reservation submitted successfully! We'll contact you soon.",
+          {
+            autoClose: 1000,
+          }
         );
 
         // Trigger a custom event to refresh admin dashboard
-        const refreshEvent = new CustomEvent('refreshAdminDashboard');
+        const refreshEvent = new CustomEvent("refreshAdminDashboard");
         window.dispatchEvent(refreshEvent);
 
         // Navigate to a success/status page
@@ -99,7 +102,9 @@ function Checkout({ onAddToCartSuccess }) {
         });
       } else {
         // Handle other successful but unexpected responses
-        toast.error(response.data || "Reservation submission failed.");
+        toast.error(response.data || "Reservation submission failed.", {
+          autoClose: 1000,
+        });
         setSubmissionError(response.data || "Reservation submission failed.");
       }
     } catch (error) {
@@ -109,7 +114,9 @@ function Checkout({ onAddToCartSuccess }) {
         error.message ||
         "Failed to submit reservation.";
       setSubmissionError(errorMessage);
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        autoClose: 1000,
+      });
     } finally {
       setSubmitting(false);
     }

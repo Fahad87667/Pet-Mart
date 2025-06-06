@@ -4,7 +4,10 @@ import com.example.demo.model.CartInfo;
 import com.example.demo.model.CartLineInfo;
 import com.example.demo.model.ProductInfo;
 import com.example.demo.entity.Product;
+import com.example.demo.entity.PersistentCart;
 import com.example.demo.repository.ProductRepository;
+import com.example.demo.repository.PersistentCartRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,12 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private PersistentCartRepository persistentCartRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * Get the shopping cart from the HTTP session.
      * If it doesn't exist, create a new one and save it.
@@ -33,11 +42,56 @@ public class CartService {
         CartInfo cartInfo = (CartInfo) session.getAttribute(CART_SESSION_KEY);
 
         if (cartInfo == null) {
-            cartInfo = new CartInfo();
+            // Try to load from persistent storage if user is logged in
+            String userId = getUserIdFromSession(session);
+            if (userId != null) {
+                cartInfo = loadCartFromPersistentStorage(userId);
+            }
+            
+            if (cartInfo == null) {
+                cartInfo = new CartInfo();
+            }
             session.setAttribute(CART_SESSION_KEY, cartInfo);
         }
 
         return cartInfo;
+    }
+
+    private String getUserIdFromSession(HttpSession session) {
+        // Get user ID from session - implement based on your authentication system
+        return (String) session.getAttribute("userId");
+    }
+
+    private CartInfo loadCartFromPersistentStorage(String userId) {
+        try {
+            return persistentCartRepository.findByUserId(userId)
+                .map(persistentCart -> {
+                    try {
+                        return objectMapper.readValue(persistentCart.getCartData(), CartInfo.class);
+                    } catch (Exception e) {
+                        logger.error("Error deserializing cart data", e);
+                        return null;
+                    }
+                })
+                .orElse(null);
+        } catch (Exception e) {
+            logger.error("Error loading cart from persistent storage", e);
+            return null;
+        }
+    }
+
+    public void saveCartToPersistentStorage(String userId, CartInfo cartInfo) {
+        try {
+            String cartData = objectMapper.writeValueAsString(cartInfo);
+            PersistentCart persistentCart = persistentCartRepository.findByUserId(userId)
+                .orElse(new PersistentCart());
+            
+            persistentCart.setUserId(userId);
+            persistentCart.setCartData(cartData);
+            persistentCartRepository.save(persistentCart);
+        } catch (Exception e) {
+            logger.error("Error saving cart to persistent storage", e);
+        }
     }
 
     /**
@@ -45,6 +99,10 @@ public class CartService {
      */
     public void removeCartInSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
+        String userId = getUserIdFromSession(session);
+        if (userId != null) {
+            persistentCartRepository.deleteByUserId(userId);
+        }
         session.removeAttribute(CART_SESSION_KEY);
     }
 
@@ -80,6 +138,12 @@ public class CartService {
         }
 
         updateCartTotals(cartInfo);
+        
+        // Save to persistent storage if user is logged in
+        String userId = getUserIdFromSession(request.getSession());
+        if (userId != null) {
+            saveCartToPersistentStorage(userId, cartInfo);
+        }
     }
 
     public void updateProductQuantity(String productCode, int quantity, HttpServletRequest request) {

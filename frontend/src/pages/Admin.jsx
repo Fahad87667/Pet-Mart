@@ -56,11 +56,15 @@ function Admin({ isAdmin, isLoggedIn }) {
   };
 
   const getStatusColor = (status) => {
-    switch(status) {
-      case 'PENDING': return 'warning';
-      case 'ACCEPTED': return 'success';
-      case 'REJECTED': return 'danger';
-      default: return 'secondary';
+    switch (status) {
+      case "PENDING":
+        return "warning";
+      case "ACCEPTED":
+        return "success";
+      case "REJECTED":
+        return "danger";
+      default:
+        return "secondary";
     }
   };
 
@@ -68,10 +72,19 @@ function Admin({ isAdmin, isLoggedIn }) {
     setResLoading(true);
     try {
       await api.put(`/admin/reservations/${id}/status`, { status });
-      toast.success(`Reservation ${status.toLowerCase()} successfully!`);
+      toast.success(`Reservation ${status.toLowerCase()} successfully!`, {
+        autoClose: 1000,
+      });
       fetchReservations();
     } catch (err) {
-      toast.error(`Failed to update status: ${err.response?.data?.message || err.message}`);
+      toast.error(
+        `Failed to update status: ${
+          err.response?.data?.message || err.message
+        }`,
+        {
+          autoClose: 1000,
+        }
+      );
     } finally {
       setResLoading(false);
     }
@@ -97,15 +110,21 @@ function Admin({ isAdmin, isLoggedIn }) {
       if (showEditModal && selectedPet) {
         data.append("code", selectedPet.code);
         await adminService.updateProduct(selectedPet.code, data);
-        toast.success("Pet updated successfully!");
+        toast.success("Pet updated successfully!", {
+          autoClose: 1000,
+        });
       } else {
         await adminService.addProduct(data);
-        toast.success("Pet added successfully!");
+        toast.success("Pet added successfully!", {
+          autoClose: 1000,
+        });
       }
       fetchPets();
     } catch (error) {
       console.error("Error:", error);
-      toast.error(`Failed: ${error.message || "Unknown error"}`);
+      toast.error(`Failed: ${error.message || "Unknown error"}`, {
+        autoClose: 1000,
+      });
     }
     handleCloseModal();
   };
@@ -129,7 +148,9 @@ function Admin({ isAdmin, isLoggedIn }) {
     try {
       const response = await api.get("/admin/reservations");
       console.log("Fetched reservations:", response.data);
-      const pendingCount = response.data.filter(r => r.status === "PENDING").length;
+      const pendingCount = response.data.filter(
+        (r) => r.status === "PENDING"
+      ).length;
       console.log("Pending reservations count:", pendingCount);
       setReservations(response.data || []);
       setResError(null);
@@ -151,7 +172,9 @@ function Admin({ isAdmin, isLoggedIn }) {
     } catch (err) {
       console.error("Error fetching contacts:", err);
       setContactError(err.message || "Failed to fetch contact submissions");
-      toast.error("Failed to fetch contact submissions. Please try again later.");
+      toast.error(
+        "Failed to fetch contact submissions. Please try again later."
+      );
     } finally {
       setContactLoading(false);
     }
@@ -169,11 +192,11 @@ function Admin({ isAdmin, isLoggedIn }) {
       fetchReservations();
       fetchContacts();
     };
-    window.addEventListener('refreshAdminDashboard', handleRefresh);
+    window.addEventListener("refreshAdminDashboard", handleRefresh);
 
     // Cleanup event listener
     return () => {
-      window.removeEventListener('refreshAdminDashboard', handleRefresh);
+      window.removeEventListener("refreshAdminDashboard", handleRefresh);
     };
   }, [isLoggedIn, isAdmin]);
 
@@ -181,12 +204,17 @@ function Admin({ isAdmin, isLoggedIn }) {
     if (window.confirm("Are you sure you want to delete this pet?")) {
       try {
         await adminService.deleteProduct(petCode);
-        toast.success("Pet deleted successfully!");
+        toast.error("Pet deleted successfully!", {
+          autoClose: 1000,
+        });
         fetchPets();
       } catch (error) {
         console.error("Error deleting pet:", error);
         toast.error(
-          `Failed to delete pet: ${error.message || "Unknown error"}`
+          `Failed to delete pet: ${error.message || "Unknown error"}`,
+          {
+            autoClose: 1000,
+          }
         );
       }
     }
@@ -459,7 +487,7 @@ function Admin({ isAdmin, isLoggedIn }) {
                 <h4 style={{ fontWeight: "600", marginBottom: "1rem" }}>
                   Pet Reservations
                 </h4>
-                
+
                 {resError && (
                   <Alert variant="danger" className="mb-3">
                     {resError}
@@ -485,14 +513,18 @@ function Admin({ isAdmin, isLoggedIn }) {
                             <td>
                               <div className="reservation-info">
                                 <div className="reservation-header">
-                                  <span className="reservation-id">#{reservation.id}</span>
+                                  <span className="reservation-id">
+                                    #{reservation.id}
+                                  </span>
                                   <span className="reservation-date">
-                                    {new Date(reservation.reservationDate).toLocaleDateString('en-US', {
-                                      year: 'numeric',
-                                      month: 'short',
-                                      day: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit'
+                                    {new Date(
+                                      reservation.reservationDate
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
                                     })}
                                   </span>
                                 </div>
@@ -522,61 +554,85 @@ function Admin({ isAdmin, isLoggedIn }) {
                                     <i className="bi bi-telephone"></i>
                                     <span>{reservation.customerPhone}</span>
                                   </div>
-                                  {reservation.customerAddress && reservation.customerAddress !== "N/A" && (
-                                    <div className="detail-item">
-                                      <i className="bi bi-geo-alt"></i>
-                                      <span>{reservation.customerAddress}</span>
-                                    </div>
-                                  )}
+                                  {reservation.customerAddress &&
+                                    reservation.customerAddress !== "N/A" && (
+                                      <div className="detail-item">
+                                        <i className="bi bi-geo-alt"></i>
+                                        <span>
+                                          {reservation.customerAddress}
+                                        </span>
+                                      </div>
+                                    )}
                                 </div>
                               </div>
                             </td>
                             <td>
-                              {reservation.reservedItemsDetails && 
-                               JSON.parse(reservation.reservedItemsDetails).map((item, idx) => (
-                                <div key={`item-${reservation.id}-${idx}`} className="pet-item">
-                                  <div className="pet-image">
-                                    <img
-                                      src={item.productInfo.imagePath 
-                                           ? `http://localhost:8080${item.productInfo.imagePath}`
-                                           : 'https://via.placeholder.com/40'}
-                                      alt={item.productInfo.name}
-                                    />
+                              {reservation.reservedItemsDetails &&
+                                JSON.parse(
+                                  reservation.reservedItemsDetails
+                                ).map((item, idx) => (
+                                  <div
+                                    key={`item-${reservation.id}-${idx}`}
+                                    className="pet-item"
+                                  >
+                                    <div className="pet-image">
+                                      <img
+                                        src={
+                                          item.productInfo.imagePath
+                                            ? `http://localhost:8080${item.productInfo.imagePath}`
+                                            : "https://via.placeholder.com/40"
+                                        }
+                                        alt={item.productInfo.name}
+                                      />
+                                    </div>
+                                    <div className="pet-details">
+                                      <div className="pet-name">
+                                        <span>{item.productInfo.name}</span>
+                                        <Badge
+                                          bg={getTypeBadgeColor(
+                                            item.productInfo.type
+                                          )}
+                                        >
+                                          {item.productInfo.type}
+                                        </Badge>
+                                      </div>
+                                      <div className="pet-info">
+                                        <span className="breed">
+                                          {item.productInfo.breed}
+                                        </span>
+                                        <span className="age">
+                                          {item.productInfo.age}
+                                        </span>
+                                      </div>
+                                      <div className="pet-price">
+                                        <span className="amount">
+                                          ₹{item.amount.toFixed(2)}
+                                        </span>
+                                        <span className="quantity">
+                                          Qty: {item.quantity}
+                                        </span>
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="pet-details">
-                                    <div className="pet-name">
-                                      <span>{item.productInfo.name}</span>
-                                      <Badge bg={getTypeBadgeColor(item.productInfo.type)}>
-                                        {item.productInfo.type}
-                                      </Badge>
-                                    </div>
-                                    <div className="pet-info">
-                                      <span className="breed">{item.productInfo.breed}</span>
-                                      <span className="age">{item.productInfo.age}</span>
-                                    </div>
-                                    <div className="pet-price">
-                                      <span className="amount">₹{item.amount.toFixed(2)}</span>
-                                      <span className="quantity">Qty: {item.quantity}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
+                                ))}
                             </td>
                             <td>
                               <div className="visit-date">
                                 <i className="bi bi-calendar-check"></i>
                                 <span>
-                                  {new Date(reservation.preferredVisitDate).toLocaleDateString('en-US', {
-                                    weekday: 'short',
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
+                                  {new Date(
+                                    reservation.preferredVisitDate
+                                  ).toLocaleDateString("en-US", {
+                                    weekday: "short",
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
                                   })}
                                 </span>
                               </div>
                             </td>
                             <td>
-                              <Badge 
+                              <Badge
                                 bg={getStatusColor(reservation.status)}
                                 className="status-badge"
                               >
@@ -587,20 +643,30 @@ function Admin({ isAdmin, isLoggedIn }) {
                               <div className="action-buttons">
                                 {reservation.status === "PENDING" && (
                                   <>
-                                    <Button 
-                                      variant="success" 
-                                      size="sm" 
-                                      onClick={() => handleReservationStatus(reservation.id, "ACCEPTED")}
+                                    <Button
+                                      variant="success"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleReservationStatus(
+                                          reservation.id,
+                                          "ACCEPTED"
+                                        )
+                                      }
                                       disabled={resLoading}
                                       className="action-button"
                                     >
                                       <i className="bi bi-check-circle"></i>
                                       Accept
                                     </Button>
-                                    <Button 
-                                      variant="danger" 
-                                      size="sm" 
-                                      onClick={() => handleReservationStatus(reservation.id, "REJECTED")}
+                                    <Button
+                                      variant="danger"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleReservationStatus(
+                                          reservation.id,
+                                          "REJECTED"
+                                        )
+                                      }
                                       disabled={resLoading}
                                       className="action-button"
                                     >
@@ -624,7 +690,9 @@ function Admin({ isAdmin, isLoggedIn }) {
                     <div className="text-center py-5">
                       <div className="empty-state-icon">📋</div>
                       <h5>No Reservations Found</h5>
-                      <p>When customers make reservations, they will appear here.</p>
+                      <p>
+                        When customers make reservations, they will appear here.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -633,11 +701,16 @@ function Admin({ isAdmin, isLoggedIn }) {
               <Tab eventKey="contacts" title="Contact Submissions">
                 <Card className="mt-4">
                   <Card.Body>
-                    <h3 className="mb-4" style={{
-                      color: "#6366f1",
-                      fontWeight: "600"
-                    }}>Contact Form Submissions</h3>
-                    
+                    <h3
+                      className="mb-4"
+                      style={{
+                        color: "#6366f1",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Contact Form Submissions
+                    </h3>
+
                     {contactLoading ? (
                       <div className="text-center py-4">
                         <Spinner animation="border" variant="primary" />
@@ -662,13 +735,23 @@ function Admin({ isAdmin, isLoggedIn }) {
                           <tbody>
                             {contacts.map((contact) => (
                               <tr key={contact.id}>
-                                <td>{new Date(contact.createdAt).toLocaleDateString()}</td>
+                                <td>
+                                  {new Date(
+                                    contact.createdAt
+                                  ).toLocaleDateString()}
+                                </td>
                                 <td>{contact.name}</td>
                                 <td>{contact.email}</td>
                                 <td>{contact.phone}</td>
                                 <td>{contact.subject}</td>
                                 <td>
-                                  <div style={{ maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  <div
+                                    style={{
+                                      maxWidth: "200px",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                    }}
+                                  >
                                     {contact.message}
                                   </div>
                                 </td>

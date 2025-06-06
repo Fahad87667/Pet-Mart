@@ -39,11 +39,15 @@ function Header({
       await logout();
       // Call updateAuthState to reset state in App.jsx
       updateAuthState(null);
-      toast.success("Logged out successfully");
+      toast.error("Logged out successfully", {
+        autoClose: 1000,
+      });
       navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
-      toast.error("Failed to logout");
+      toast.error("Failed to logout", {
+        autoClose: 1000,
+      });
     }
   };
 

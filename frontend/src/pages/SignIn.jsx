@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
+import { toast } from "react-toastify";
 import "./style.css";
 
 function SignIn({ updateAuthState }) {
@@ -19,6 +20,9 @@ function SignIn({ updateAuthState }) {
       const user = await login(formData.email, formData.password);
       if (user) {
         updateAuthState(user);
+        toast.success("Signed in successfully!", {
+          autoClose: 1000,
+        });
         navigate("/");
       } else {
         setError("Invalid email or password");
