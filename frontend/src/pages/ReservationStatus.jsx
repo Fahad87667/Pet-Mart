@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Container, Card, Spinner, Alert, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -12,6 +12,7 @@ function ReservationStatus() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const toastShown = useRef(false);
 
   useEffect(() => {
     if (!status) {
@@ -19,22 +20,25 @@ function ReservationStatus() {
       return;
     }
 
-    // Show appropriate toast based on status
-    if (status === "PENDING") {
-      toast.info("Your reservation is being reviewed. We'll contact you soon!", {
-        position: "top-center",
-        autoClose: 5000,
-      });
-    } else if (status === "ACCEPTED") {
-      toast.success("Your reservation has been accepted!", {
-        position: "top-center",
-        autoClose: 5000,
-      });
-    } else if (status === "REJECTED") {
-      toast.error("Your reservation has been rejected.", {
-        position: "top-center",
-        autoClose: 5000,
-      });
+    // Show toast only once
+    if (!toastShown.current) {
+      if (status === "PENDING") {
+        toast.info("Your reservation is being reviewed. We'll contact you soon!", {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      } else if (status === "ACCEPTED") {
+        toast.success("Your reservation has been accepted!", {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      } else if (status === "REJECTED") {
+        toast.error("Your reservation has been rejected.", {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      }
+      toastShown.current = true;
     }
 
     const timer = setTimeout(() => {

@@ -148,11 +148,17 @@ function Admin({ isAdmin, isLoggedIn }) {
     try {
       const response = await api.get("/admin/reservations");
       console.log("Fetched reservations:", response.data);
-      const pendingCount = response.data.filter(
-        (r) => r.status === "PENDING"
-      ).length;
-      console.log("Pending reservations count:", pendingCount);
-      setReservations(response.data || []);
+      // Sort reservations: PENDING first, then by date (newest first)
+      const sortedReservations = response.data.sort((a, b) => {
+        // First sort by status (PENDING first)
+        if (a.status === "PENDING" && b.status !== "PENDING") return -1;
+        if (a.status !== "PENDING" && b.status === "PENDING") return 1;
+        
+        // Then sort by date (newest first)
+        return new Date(b.reservationDate) - new Date(a.reservationDate);
+      });
+      
+      setReservations(sortedReservations || []);
       setResError(null);
     } catch (err) {
       console.error("Error fetching reservations:", err);

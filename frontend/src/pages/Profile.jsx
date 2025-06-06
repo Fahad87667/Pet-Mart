@@ -7,6 +7,7 @@ import {
   Button,
   Badge,
   Spinner,
+  Image,
 } from "react-bootstrap";
 import { getCurrentUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
@@ -64,6 +65,7 @@ function Profile() {
       try {
         setReservationLoading(true);
         const userReservations = await reservationService.getUserReservations();
+        console.log("Fetched reservations:", userReservations);
         setReservations(userReservations || []);
       } catch (err) {
         console.error("Error fetching reservations:", err);
@@ -546,38 +548,39 @@ function Profile() {
                                 alignItems: "flex-start",
                               }}
                             >
-                              <div>
-                                <h6
-                                  className="mb-0"
-                                  style={{
-                                    color: "#1e293b",
-                                    fontWeight: "700",
-                                    fontSize: "1rem",
-                                  }}
-                                >
-                                  {reservation.petName}
-                                </h6>
+                              <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
                                 {reservation.reservedItemsDetails &&
                                   (() => {
                                     try {
                                       const details = JSON.parse(
                                         reservation.reservedItemsDetails
                                       );
+                                      console.log("Full reservation details:", reservation);
+                                      console.log("Parsed reservation details:", details);
                                       if (
                                         details &&
                                         details.length > 0 &&
-                                        details[0].product
+                                        details[0].productInfo
                                       ) {
-                                        const product = details[0].product;
+                                        const product = details[0].productInfo;
+                                        console.log("Product info structure:", {
+                                          name: product.name,
+                                          imagePath: product.imagePath,
+                                          type: product.type,
+                                          breed: product.breed
+                                        });
                                         return (
-                                          <span
+                                          <Image
+                                            src={product.imagePath ? `http://localhost:8080${product.imagePath}` : "https://via.placeholder.com/100?text=No+Image"}
+                                            alt={product.name}
                                             style={{
-                                              color: "#64748b",
-                                              fontSize: "0.875rem",
+                                              width: "80px",
+                                              height: "80px",
+                                              objectFit: "cover",
+                                              borderRadius: "12px",
+                                              border: "2px solid #e2e8f0",
                                             }}
-                                          >
-                                            {product.type} • {product.breed}
-                                          </span>
+                                          />
                                         );
                                       }
                                     } catch (e) {
@@ -588,6 +591,49 @@ function Profile() {
                                     }
                                     return null;
                                   })()}
+                                <div>
+                                  <h6
+                                    className="mb-0"
+                                    style={{
+                                      color: "#1e293b",
+                                      fontWeight: "700",
+                                      fontSize: "1rem",
+                                    }}
+                                  >
+                                    {reservation.petName}
+                                  </h6>
+                                  {reservation.reservedItemsDetails &&
+                                    (() => {
+                                      try {
+                                        const details = JSON.parse(
+                                          reservation.reservedItemsDetails
+                                        );
+                                        if (
+                                          details &&
+                                          details.length > 0 &&
+                                          details[0].productInfo
+                                        ) {
+                                          const product = details[0].productInfo;
+                                          return (
+                                            <span
+                                              style={{
+                                                color: "#64748b",
+                                                fontSize: "0.875rem",
+                                              }}
+                                            >
+                                              {product.type} • {product.breed}
+                                            </span>
+                                          );
+                                        }
+                                      } catch (e) {
+                                        console.error(
+                                          "Failed to parse reservedItemsDetails",
+                                          e
+                                        );
+                                      }
+                                      return null;
+                                    })()}
+                                </div>
                               </div>
 
                               <div className="d-flex align-items-center gap-2">
