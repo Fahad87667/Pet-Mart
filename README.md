@@ -30,7 +30,9 @@ The project is organized into two main components:
 ### Frontend Setup
 1. Navigate to the `frontend` directory
 2. Run `npm install` to install dependencies
-3. Start the development server
+3. Start the development server using one of the following methods:
+   - **Option 1**: Run `npm run dev` in the command prompt (cmd). If this does not work, try the next option.
+   - **Option 2**: Run `start-dev.ps1` in PowerShell.
 
 ## Development
 
