@@ -1,49 +1,89 @@
-# Pet-Mart
+# Pet Mart - Pet Adoption Platform
 
-A full-stack e-commerce platform for pet supplies and services.
+## Overview
 
-## Project Structure
+Pet Mart is a comprehensive pet adoption platform that connects potential pet owners with available pets. The platform features a user-friendly interface for browsing pets, managing reservations, and handling the adoption process.
 
-The project is organized into two main components:
+## Features
 
-### Backend
-- Built with Java Spring Boot
-- Maven for dependency management
-- RESTful API architecture
+- User authentication and authorization
+- Browse available pets with detailed information
+- Shopping cart functionality for pet reservations
+- Reservation management system
+- User profile management
+- Admin dashboard for managing pets and reservations
+- Responsive design for all devices
 
-### Frontend
-- Modern web application
-- Located in the `frontend` directory
+## Tech Stack
+
+- **Frontend**: React.js, React Bootstrap, React Router
+- **Backend**: Spring Boot, Spring Security
+- **Database**: MySQL
+- **Authentication**: JWT (JSON Web Tokens)
+
+## Project Screenshots
+
+### Homepage
+
+![Homepage](images/homepage.png)
+The main landing page showcasing featured pets and navigation options.
+
+### Pet List
+
+![Pet List](images/petlist.png)
+Browse through available pets with filtering and search capabilities.
+
+### Pet Details
+
+![Pet Details](images/petdetails.png)
+Detailed view of each pet with comprehensive information and reservation options.
+
+### Shopping Cart
+
+![Shopping Cart](images/cart.png)
+Manage your pet reservations in the shopping cart.
+
+### Reservation Form
+
+![Reservation Form](images/reservationform.png)
+Complete the reservation process with the user-friendly form.
+
+### User Profile
+
+![Profile Page](images/profile%20page.png)
+View and manage your reservations and account information.
 
 ## Getting Started
 
 ### Prerequisites
-- Java Development Kit (JDK)
-- Node.js and npm
+
+- Java 17 or higher
+- Node.js
+- MySQL 8.0 or higher
 - Maven
-
-### Backend Setup
-1. Navigate to the project root directory
-2. Run `mvn clean install` to install dependencies
-3. Start the backend server using `mvn spring-boot:run`
-
-### Frontend Setup
-1. Navigate to the `frontend` directory
-2. Run `npm install` to install dependencies
-3. Start the development server using one of the following methods:
-   - **Option 1**: Run `npm run dev` in the command prompt (cmd). If this does not work, try the next option.
-   - **Option 2**: Run `start-dev.ps1` in PowerShell.
 
 ## Development
 
 The project uses:
+
 - Maven for backend dependency management
 - npm for frontend package management
 - Git for version control
 
+## Installation
+
+1. Navigate to the project root directory
+2. Run the following command to install **both backend and frontend dependencies**:
+   ```bash
+   npm run install-all
+   ```
+
 ## Running the Application
 
-You can use the provided `run.bat` script to start the application, or run the backend and frontend separately as described in the setup instructions.
+Start the development server using one of the following methods:
+
+- **Option 1**: Run `npm run dev` in the command prompt (cmd). If this does not work, try the next option.
+- **Option 2**: Run `start-dev.ps1` in PowerShell.
 
 ## License
 
