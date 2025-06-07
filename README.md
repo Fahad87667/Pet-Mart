@@ -46,6 +46,7 @@ Manage your pet reservations in the shopping cart.
 ### Reservation Form
 
 ![Reservation Form](Images/reservationform.png)
+
 Complete the reservation process with the user-friendly form.
 
 ### User Profile
