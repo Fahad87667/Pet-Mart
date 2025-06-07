@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Random;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -226,6 +227,38 @@ public class ApiController {
             logger.error("Error fetching user reservations", e);
             Map<String, String> error = new HashMap<>();
             error.put("error", "Failed to fetch user reservations");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
+    @GetMapping("/reservations/me/active")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUserActiveReservations() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+                 return ResponseEntity.status(401).body("User not authenticated");
+            }
+
+            String userEmail = authentication.getName();
+
+            List<Reservation> userReservations = reservationService.getReservationsByCustomerEmail(userEmail);
+            
+            // Filter out ACCEPTED and REJECTED reservations
+            List<Reservation> activeReservations = userReservations.stream()
+                .filter(reservation -> reservation.getStatus() == Reservation.ReservationStatus.PENDING)
+                .collect(Collectors.toList());
+
+            logger.debug("Found {} active reservations for user {}", activeReservations.size(), userEmail);
+
+            return ResponseEntity.ok(activeReservations);
+
+        } catch (Exception e) {
+            logger.error("Error fetching user active reservations", e);
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to fetch user active reservations");
             error.put("message", e.getMessage());
             return ResponseEntity.status(500).body(error);
         }

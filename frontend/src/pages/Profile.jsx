@@ -18,17 +18,22 @@ function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [allReservations, setAllReservations] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [reservationLoading, setReservationLoading] = useState(true);
   const [reservationError, setReservationError] = useState(null);
   const [withdrawingId, setWithdrawingId] = useState(null);
   const [clearingReservations, setClearingReservations] = useState(false);
+  const [hideCompleted, setHideCompleted] = useState(() => {
+    return localStorage.getItem("hideCompletedReservations") === "true";
+  });
   const navigate = useNavigate();
 
   const handleWithdraw = async (reservationId) => {
     try {
       setWithdrawingId(reservationId);
       await reservationService.withdrawReservation(reservationId);
+      setAllReservations(allReservations.filter((r) => r.id !== reservationId));
       setReservations(reservations.filter((r) => r.id !== reservationId));
       toast.success("Reservation withdrawn successfully");
     } catch (error) {
@@ -44,15 +49,36 @@ function Profile() {
   const handleClearCompleted = async () => {
     try {
       setClearingReservations(true);
-      await reservationService.clearCompletedReservations();
-      // Update the reservations list by removing ACCEPTED and REJECTED ones
-      setReservations(reservations.filter((r) => r.status === "PENDING"));
-      toast.success("Completed reservations cleared successfully");
+      const activeReservations =
+        await reservationService.clearCompletedReservations();
+      setAllReservations(activeReservations);
+      setReservations(activeReservations);
+      setHideCompleted(true);
+      localStorage.setItem("hideCompletedReservations", "true");
+      toast.success("Completed reservations hidden from view");
     } catch (error) {
-      console.error("Error clearing completed reservations:", error);
+      console.error("Error hiding completed reservations:", error);
       toast.error(
-        error.response?.data?.message ||
-          "Failed to clear completed reservations"
+        error.response?.data?.message || "Failed to hide completed reservations"
+      );
+    } finally {
+      setClearingReservations(false);
+    }
+  };
+
+  const handleShowAll = async () => {
+    try {
+      setClearingReservations(true);
+      const allReservations = await reservationService.getUserReservations();
+      setAllReservations(allReservations);
+      setReservations(allReservations);
+      setHideCompleted(false);
+      localStorage.setItem("hideCompletedReservations", "false");
+      toast.success("Showing all reservations");
+    } catch (error) {
+      console.error("Error showing all reservations:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to show all reservations"
       );
     } finally {
       setClearingReservations(false);
@@ -81,17 +107,16 @@ function Profile() {
 
   useEffect(() => {
     const fetchReservations = async () => {
-      if (!user) return;
-
       try {
         setReservationLoading(true);
-        const userReservations = await reservationService.getUserReservations();
-        console.log("Fetched reservations:", userReservations);
-        // Sort reservations by reservationDate in descending order (most recent first)
-        const sortedReservations = userReservations.sort((a, b) => {
-          return new Date(b.reservationDate) - new Date(a.reservationDate);
-        });
-        setReservations(sortedReservations || []);
+        const data = await reservationService.getUserReservations();
+        setAllReservations(data);
+        if (hideCompleted) {
+          setReservations(data.filter((r) => r.status === "PENDING"));
+        } else {
+          setReservations(data);
+        }
+        setReservationError(null);
       } catch (err) {
         console.error("Error fetching reservations:", err);
         setReservationError("Failed to load reservations.");
@@ -101,7 +126,7 @@ function Profile() {
     };
 
     fetchReservations();
-  }, [user]);
+  }, [hideCompleted]);
 
   if (loading) {
     return (
@@ -511,10 +536,10 @@ function Profile() {
                     padding: "1.5rem",
                   }}
                 >
-                  {reservations.some(
-                    (r) => r.status === "ACCEPTED" || r.status === "REJECTED"
-                  ) && (
-                    <div className="mb-4 d-flex justify-content-end">
+                  <div className="mb-4 d-flex justify-content-end">
+                    {reservations.some(
+                      (r) => r.status === "ACCEPTED" || r.status === "REJECTED"
+                    ) && !hideCompleted ? (
                       <Button
                         variant="outline-danger"
                         onClick={handleClearCompleted}
@@ -530,17 +555,44 @@ function Profile() {
                         {clearingReservations ? (
                           <>
                             <Spinner animation="border" size="sm" />
-                            Clearing...
+                            Hiding...
                           </>
                         ) : (
                           <>
-                            <i className="bi bi-trash"></i>
-                            Clear Completed Reservations
+                            <i className="bi bi-eye-slash"></i>
+                            Hide Completed Reservations
                           </>
                         )}
                       </Button>
-                    </div>
-                  )}
+                    ) : (
+                      hideCompleted && (
+                        <Button
+                          variant="outline-primary"
+                          onClick={handleShowAll}
+                          disabled={clearingReservations}
+                          style={{
+                            borderRadius: "20px",
+                            padding: "0.5rem 1.5rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          {clearingReservations ? (
+                            <>
+                              <Spinner animation="border" size="sm" />
+                              Loading...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-eye"></i>
+                              Show All Reservations
+                            </>
+                          )}
+                        </Button>
+                      )
+                    )}
+                  </div>
                   {reservationLoading ? (
                     <div className="text-center py-5">
                       <Spinner

@@ -14,6 +14,18 @@ export const getUserReservations = async () => {
   }
 };
 
+export const getActiveReservations = async () => {
+  try {
+    console.log("Fetching active reservations...");
+    const response = await api.get("/reservations/me/active");
+    console.log("Active reservations fetched:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching active reservations:", error);
+    throw error;
+  }
+};
+
 export const withdrawReservation = async (reservationId) => {
   try {
     const response = await api.delete(`/reservations/${reservationId}`);
@@ -26,8 +38,9 @@ export const withdrawReservation = async (reservationId) => {
 
 export const clearCompletedReservations = async () => {
   try {
-    const response = await api.delete("/reservations/clear");
-    return response.data;
+    // Instead of deleting, just fetch active reservations
+    const response = await getActiveReservations();
+    return response;
   } catch (error) {
     console.error("Error clearing completed reservations:", error);
     throw error;
