@@ -53,7 +53,7 @@ function About() {
         "Responsive Design",
       ],
       icon: "👩‍💻",
-      image: "./public/images/sumayya.jpg",
+      image: "/images/Sumayya.jpg",
     },
   ];
 
