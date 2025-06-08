@@ -26,31 +26,37 @@ Pet Mart is a comprehensive pet adoption platform that connects potential pet ow
 ### Homepage
 
 ![Homepage](Images/homepage.png)
+
 The main landing page showcasing featured pets and navigation options.
 
 ### Pet List
 
 ![Pet List](Images/petlist.png)
+
 Browse through available pets with filtering and search capabilities.
 
 ### Pet Details
 
 ![Pet Details](Images/petdetails.png)
+
 Detailed view of each pet with comprehensive information and reservation options.
 
 ### Shopping Cart
 
 ![Shopping Cart](Images/cart.png)
+
 Manage your pet reservations in the shopping cart.
 
 ### Reservation Form
 
 ![Reservation Form](Images/reservationform.png)
+
 Complete the reservation process with the user-friendly form.
 
 ### User Profile
 
 ![Profile Page](Images/profile%20page.png)
+
 View and manage your reservations and account information.
 
 ## Getting Started
