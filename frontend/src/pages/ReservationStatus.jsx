@@ -19,32 +19,26 @@ function ReservationStatus() {
       navigate("/");
       return;
     }
-
-    // Show toast only once
-    if (!toastShown.current) {
-      if (status === "PENDING") {
-        toast.info("Your reservation is being reviewed. We'll contact you soon!", {
-          position: "top-center",
-          autoClose: 5000,
-        });
-      } else if (status === "ACCEPTED") {
-        toast.success("Your reservation has been accepted!", {
-          position: "top-center",
-          autoClose: 5000,
-        });
-      } else if (status === "REJECTED") {
-        toast.error("Your reservation has been rejected.", {
-          position: "top-center",
-          autoClose: 5000,
-        });
-      }
-      toastShown.current = true;
+    // Dismiss any previous reservation status toast
+    toast.dismiss("reservation-status-toast");
+    let message = "";
+    if (status === "PENDING") {
+      message = "Your reservation is being reviewed. We'll contact you soon!";
+    } else if (status === "ACCEPTED") {
+      message = "Your reservation has been accepted!";
+    } else if (status === "REJECTED") {
+      message = "Your reservation has been rejected.";
     }
-
+    if (message) {
+      toast.info(message, {
+        toastId: "reservation-status-toast",
+        position: "top-center",
+        autoClose: 5000,
+      });
+    }
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);
-
     return () => clearTimeout(timer);
   }, [status, navigate]);
 
@@ -57,11 +51,9 @@ function ReservationStatus() {
         </div>
       );
     }
-
     if (error) {
       return <Alert variant="danger">Error: {error}</Alert>;
     }
-
     switch (status) {
       case "PENDING":
         return (

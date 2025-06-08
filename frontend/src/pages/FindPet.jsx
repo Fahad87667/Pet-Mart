@@ -102,7 +102,7 @@ function FindPet({ onAddToCartSuccess, isAdmin }) {
 
   const handleAddToCartSuccess = async (updatedCart) => {
     if (onAddToCartSuccess) {
-      onAddToCartSuccess(updatedCart);
+      onAddToCartSuccess();
     }
     await fetchCart();
   };

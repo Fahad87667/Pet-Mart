@@ -121,7 +121,10 @@ function App() {
               path="/signin"
               element={<SignIn updateAuthState={updateAuthState} />}
             />
-            <Route path="/product/:code" element={<ProductDetails />} />
+            <Route
+              path="/product/:code"
+              element={<ProductDetails onAddToCartSuccess={triggerCartUpdate} />}
+            />
             <Route
               path="/checkout"
               element={<Checkout onAddToCartSuccess={triggerCartUpdate} />}
