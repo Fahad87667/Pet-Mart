@@ -327,7 +327,7 @@ function SignIn({ updateAuthState }) {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   style={{ fontSize: "0.9rem", color: "#4a5568" }}
                 />
-                <Link
+                {/* <Link
                   to="/forgot-password"
                   style={{
                     color: "#667eea",
@@ -340,7 +340,7 @@ function SignIn({ updateAuthState }) {
                   onMouseLeave={(e) => (e.target.style.color = "#667eea")}
                 >
                   Forgot password?
-                </Link>
+                </Link> */}
               </div>
 
               <Button
