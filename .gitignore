@@ -55,5 +55,9 @@ Thumbs.db
 notes.txt
 notes.txt.pdf
 
+# Java HotSpot VM logs
+hs_err_pid*.log
+replay_pid*.log
+
 
 
