@@ -2,7 +2,7 @@
 
 ## Overview
 
-Pet Mart is a comprehensive pet adoption platform that connects potential pet owners with available pets. The platform features a user-friendly interface for browsing pets, managing reservations, and handling the adoption process.
+Pet Mart is a comprehensive pet adoption platform that connects potential pet owners with available pets. The platform features a user-friendly interface for browsing pets, managing reservations, and handling the adoption process..
 
 ## Features
 
