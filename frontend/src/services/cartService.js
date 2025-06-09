@@ -63,7 +63,7 @@ const cartService = {
 
   async clearCart() {
     try {
-      const response = await api.post("/cart/clear");
+      const response = await api.delete("/cart");
       return response.data;
     } catch (error) {
       if (error.response && error.response.status === 401) {

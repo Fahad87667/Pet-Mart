@@ -12,6 +12,7 @@ import {
 import { productService } from "../services/productService";
 import { cartService } from "../services/cartService";
 import { toast } from "react-toastify";
+import { getCurrentUser } from "../services/authService";
 
 function ProductDetails({ onAddToCartSuccess }) {
   const { code } = useParams();
@@ -20,41 +21,70 @@ function ProductDetails({ onAddToCartSuccess }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
         const response = await productService.getProduct(code);
         setProduct(response);
         setError(null);
+        // Check login
+        const user = await getCurrentUser();
+        setIsLoggedIn(!!user);
+        // Check cart
+        const cart = await cartService.getCart();
+        const inCart = cart.cartLines?.some(
+          (line) => line.productInfo?.code === code
+        );
+        setIsAddedToCart(inCart);
       } catch (err) {
         setError(err.message || "Failed to fetch product details");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProduct();
+    fetchData();
   }, [code]);
 
-  const handleAddToCart = async () => {
+  const handleCartAction = async () => {
+    if (!isLoggedIn) {
+      toast.info("Please sign in to add items to cart", {
+        position: "top-center",
+        autoClose: 2000,
+        onClose: () => navigate("/signin"),
+      });
+      return;
+    }
     if (!product) return;
-    
     setAddingToCart(true);
     try {
-      await cartService.addToCart(product.code, 1);
-      toast.success("Added to cart successfully!", {
-        position: "top-center",
-        autoClose: 2000,
-      });
+      if (isAddedToCart) {
+        const updatedCart = await cartService.removeFromCart(product.code);
+        toast.error("Removed from cart!", { autoClose: 1000 });
+        setIsAddedToCart(false);
+        // If cart is empty, update any local state if needed
+        if (
+          !updatedCart ||
+          !updatedCart.cartLines ||
+          updatedCart.cartLines.length === 0
+        ) {
+          // Optionally, trigger a global cart update or clear local cart state
+        }
+      } else {
+        await cartService.addToCart(product.code, 1);
+        toast.success("Added to cart!", { autoClose: 1000 });
+        setIsAddedToCart(true);
+      }
       if (onAddToCartSuccess) {
-        onAddToCartSuccess();
+        const updatedCart = await cartService.getCart();
+        onAddToCartSuccess(updatedCart);
       }
     } catch (error) {
-      toast.error(error.message || "Failed to add to cart", {
-        position: "top-center",
-        autoClose: 2000,
-      });
+      toast.error(
+        isAddedToCart ? "Failed to remove from cart" : "Failed to add to cart"
+      );
     } finally {
       setAddingToCart(false);
     }
@@ -604,44 +634,48 @@ function ProductDetails({ onAddToCartSuccess }) {
                   </div>
                 </div>
 
-                <Button
-                  variant="primary"
-                  onClick={handleAddToCart}
-                  disabled={addingToCart || product?.status !== "AVAILABLE"}
-                  style={{
-                    borderRadius: "30px",
-                    padding: "0.75rem 2.5rem",
-                    fontWeight: "600",
-                    background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-                    border: "none",
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = "translateY(-2px)";
-                    e.target.style.boxShadow = "0 6px 20px rgba(99, 102, 241, 0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = "translateY(0)";
-                    e.target.style.boxShadow = "0 4px 15px rgba(99, 102, 241, 0.3)";
-                  }}
-                >
-                  {addingToCart ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                        className="me-2"
-                      />
-                      Adding...
-                    </>
-                  ) : (
-                    "Add to Cart"
-                  )}
-                </Button>
+                <div style={{ textAlign: "center", marginTop: "2rem" }}>
+                  <Button
+                    variant={isAddedToCart ? "success" : "primary"}
+                    onClick={handleCartAction}
+                    disabled={
+                      addingToCart ||
+                      (product?.status || "").toLowerCase() !== "available"
+                    }
+                    style={{
+                      borderRadius: "30px",
+                      padding: "0.75rem 2.5rem",
+                      fontWeight: "600",
+                      background: addingToCart
+                        ? "#28a745"
+                        : isAddedToCart
+                        ? "#10b981"
+                        : "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
+                      border: "none",
+                      transition: "all 0.3s ease",
+                      boxShadow: "0 4px 15px rgba(99, 102, 241, 0.3)",
+                      opacity: addingToCart ? 0.6 : 1,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow =
+                        "0 6px 20px rgba(99, 102, 241, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = "translateY(0)";
+                      e.target.style.boxShadow =
+                        "0 4px 15px rgba(99, 102, 241, 0.3)";
+                    }}
+                  >
+                    {addingToCart
+                      ? isAddedToCart
+                        ? "Removing..."
+                        : "Adding..."
+                      : isAddedToCart
+                      ? "Added to Cart"
+                      : "Add to Cart"}
+                  </Button>
+                </div>
               </div>
             </Col>
           </Row>

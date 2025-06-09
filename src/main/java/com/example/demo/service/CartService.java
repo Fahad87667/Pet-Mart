@@ -69,7 +69,12 @@ public class CartService {
             return persistentCartRepository.findByUserId(userId)
                 .map(persistentCart -> {
                     try {
-                        return objectMapper.readValue(persistentCart.getCartData(), CartInfo.class);
+                        CartInfo loaded = objectMapper.readValue(persistentCart.getCartData(), CartInfo.class);
+                        // Only restore if not empty
+                        if (loaded == null || loaded.isEmpty()) {
+                            return null;
+                        }
+                        return loaded;
                     } catch (Exception e) {
                         logger.error("Error deserializing cart data", e);
                         return null;
@@ -179,6 +184,17 @@ public class CartService {
 
         cartInfo.getCartLines().remove(line);
         updateCartTotals(cartInfo);
+
+        // Persist the updated cart if user is logged in
+        String userId = getUserIdFromSession(request.getSession());
+        if (userId != null) {
+            if (cartInfo.isEmpty()) {
+                // If cart is empty, remove persistent cart
+                persistentCartRepository.deleteByUserId(userId);
+            } else {
+                saveCartToPersistentStorage(userId, cartInfo);
+            }
+        }
     }
 
     private CartLineInfo findLineByCode(CartInfo cartInfo, String productCode) {

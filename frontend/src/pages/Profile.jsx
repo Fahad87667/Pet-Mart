@@ -55,7 +55,9 @@ function Profile() {
       setReservations(activeReservations);
       setHideCompleted(true);
       localStorage.setItem("hideCompletedReservations", "true");
-      toast.success("Completed reservations hidden from view");
+      toast.success("Completed reservations hidden from view", {
+        autoClose: 1000,
+      });
     } catch (error) {
       console.error("Error hiding completed reservations:", error);
       toast.error(
@@ -74,7 +76,9 @@ function Profile() {
       setReservations(allReservations);
       setHideCompleted(false);
       localStorage.setItem("hideCompletedReservations", "false");
-      toast.success("Showing all reservations");
+      toast.success("Showing all reservations", {
+        autoClose: 1000,
+      });
     } catch (error) {
       console.error("Error showing all reservations:", error);
       toast.error(
@@ -624,112 +628,68 @@ function Profile() {
                     </div>
                   ) : reservations.length > 0 ? (
                     <div className="row g-3">
-                      {reservations.map((reservation, index) => (
-                        <div key={index} className="col-12">
-                          <div
-                            style={{
-                              background:
-                                "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-                              borderRadius: "16px",
-                              padding: "1.25rem",
-                              border: "1px solid #e2e8f0",
-                              transition: "all 0.3s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.transform =
-                                "translateX(4px)";
-                              e.currentTarget.style.borderColor = "#c7d2fe";
-                              e.currentTarget.style.boxShadow =
-                                "0 4px 12px rgba(99, 102, 241, 0.1)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = "translateX(0)";
-                              e.currentTarget.style.borderColor = "#e2e8f0";
-                              e.currentTarget.style.boxShadow = "none";
-                            }}
-                          >
+                      {[...reservations]
+                        .sort((a, b) => {
+                          const dateA = new Date(a.reservationDate || 0);
+                          const dateB = new Date(b.reservationDate || 0);
+                          if (dateA.getTime() !== dateB.getTime()) {
+                            return dateB - dateA; // Descending by date
+                          }
+                          // If same date, use id as tiebreaker (higher id = later)
+                          return (b.id || 0) - (a.id || 0);
+                        })
+                        .map((reservation, index) => (
+                          <div key={index} className="col-12">
                             <div
                               style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "flex-start",
+                                background:
+                                  "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+                                borderRadius: "16px",
+                                padding: "1.25rem",
+                                border: "1px solid #e2e8f0",
+                                transition: "all 0.3s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform =
+                                  "translateX(4px)";
+                                e.currentTarget.style.borderColor = "#c7d2fe";
+                                e.currentTarget.style.boxShadow =
+                                  "0 4px 12px rgba(99, 102, 241, 0.1)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform =
+                                  "translateX(0)";
+                                e.currentTarget.style.borderColor = "#e2e8f0";
+                                e.currentTarget.style.boxShadow = "none";
                               }}
                             >
                               <div
                                 style={{
                                   display: "flex",
-                                  gap: "1rem",
+                                  justifyContent: "space-between",
                                   alignItems: "flex-start",
                                 }}
                               >
-                                {reservation.reservedItemsDetails &&
-                                  (() => {
-                                    try {
-                                      const details = JSON.parse(
-                                        reservation.reservedItemsDetails
-                                      );
-                                      console.log(
-                                        "Full reservation details:",
-                                        reservation
-                                      );
-                                      console.log(
-                                        "Parsed reservation details:",
-                                        details
-                                      );
-                                      if (
-                                        details &&
-                                        details.length > 0 &&
-                                        details[0].productInfo
-                                      ) {
-                                        const product = details[0].productInfo;
-                                        console.log("Product info structure:", {
-                                          name: product.name,
-                                          imagePath: product.imagePath,
-                                          type: product.type,
-                                          breed: product.breed,
-                                        });
-                                        return (
-                                          <Image
-                                            src={
-                                              product.imagePath
-                                                ? `http://localhost:8080${product.imagePath}`
-                                                : "https://via.placeholder.com/100?text=No+Image"
-                                            }
-                                            alt={product.name}
-                                            style={{
-                                              width: "80px",
-                                              height: "80px",
-                                              objectFit: "cover",
-                                              borderRadius: "12px",
-                                              border: "2px solid #e2e8f0",
-                                            }}
-                                          />
-                                        );
-                                      }
-                                    } catch (e) {
-                                      console.error(
-                                        "Failed to parse reservedItemsDetails",
-                                        e
-                                      );
-                                    }
-                                    return null;
-                                  })()}
-                                <div>
-                                  <h6
-                                    className="mb-0"
-                                    style={{
-                                      color: "#1e293b",
-                                      fontWeight: "700",
-                                      fontSize: "1rem",
-                                    }}
-                                  >
-                                    {reservation.petName}
-                                  </h6>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "1rem",
+                                    alignItems: "flex-start",
+                                  }}
+                                >
                                   {reservation.reservedItemsDetails &&
                                     (() => {
                                       try {
                                         const details = JSON.parse(
                                           reservation.reservedItemsDetails
+                                        );
+                                        console.log(
+                                          "Full reservation details:",
+                                          reservation
+                                        );
+                                        console.log(
+                                          "Parsed reservation details:",
+                                          details
                                         );
                                         if (
                                           details &&
@@ -738,15 +698,31 @@ function Profile() {
                                         ) {
                                           const product =
                                             details[0].productInfo;
+                                          console.log(
+                                            "Product info structure:",
+                                            {
+                                              name: product.name,
+                                              imagePath: product.imagePath,
+                                              type: product.type,
+                                              breed: product.breed,
+                                            }
+                                          );
                                           return (
-                                            <span
+                                            <Image
+                                              src={
+                                                product.imagePath
+                                                  ? `http://localhost:8080${product.imagePath}`
+                                                  : "https://via.placeholder.com/100?text=No+Image"
+                                              }
+                                              alt={product.name}
                                               style={{
-                                                color: "#64748b",
-                                                fontSize: "0.875rem",
+                                                width: "80px",
+                                                height: "80px",
+                                                objectFit: "cover",
+                                                borderRadius: "12px",
+                                                border: "2px solid #e2e8f0",
                                               }}
-                                            >
-                                              {product.type} • {product.breed}
-                                            </span>
+                                            />
                                           );
                                         }
                                       } catch (e) {
@@ -757,109 +733,154 @@ function Profile() {
                                       }
                                       return null;
                                     })()}
+                                  <div>
+                                    <h6
+                                      className="mb-0"
+                                      style={{
+                                        color: "#1e293b",
+                                        fontWeight: "700",
+                                        fontSize: "1rem",
+                                      }}
+                                    >
+                                      {reservation.petName}
+                                    </h6>
+                                    {reservation.reservedItemsDetails &&
+                                      (() => {
+                                        try {
+                                          const details = JSON.parse(
+                                            reservation.reservedItemsDetails
+                                          );
+                                          if (
+                                            details &&
+                                            details.length > 0 &&
+                                            details[0].productInfo
+                                          ) {
+                                            const product =
+                                              details[0].productInfo;
+                                            return (
+                                              <span
+                                                style={{
+                                                  color: "#64748b",
+                                                  fontSize: "0.875rem",
+                                                }}
+                                              >
+                                                {product.type} • {product.breed}
+                                              </span>
+                                            );
+                                          }
+                                        } catch (e) {
+                                          console.error(
+                                            "Failed to parse reservedItemsDetails",
+                                            e
+                                          );
+                                        }
+                                        return null;
+                                      })()}
+                                  </div>
                                 </div>
-                              </div>
 
-                              <div className="d-flex align-items-center gap-2">
-                                <Badge
-                                  pill
-                                  style={{
-                                    padding: "0.5rem 1rem",
-                                    fontSize: "0.8rem",
-                                    fontWeight: "600",
-                                    background:
-                                      reservation.status === "ACCEPTED"
-                                        ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-                                        : reservation.status === "REJECTED"
-                                        ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
-                                        : reservation.status === "PENDING"
-                                        ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
-                                        : "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)",
-                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                    border: "none",
-                                  }}
-                                >
-                                  {reservation.status}
-                                </Badge>
-                                {reservation.status === "PENDING" && (
-                                  <Button
-                                    variant="warning"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleWithdraw(reservation.id)
-                                    }
-                                    disabled={withdrawingId === reservation.id}
+                                <div className="d-flex align-items-center gap-2">
+                                  <Badge
+                                    pill
                                     style={{
                                       padding: "0.5rem 1rem",
                                       fontSize: "0.8rem",
                                       fontWeight: "600",
-                                      borderRadius: "20px",
-                                      border: "none",
                                       background:
-                                        "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                                      color: "white",
-                                      boxShadow:
-                                        "0 2px 4px rgba(245, 158, 11, 0.2)",
+                                        reservation.status === "ACCEPTED"
+                                          ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                                          : reservation.status === "REJECTED"
+                                          ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
+                                          : reservation.status === "PENDING"
+                                          ? "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+                                          : "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)",
+                                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                      border: "none",
                                     }}
                                   >
-                                    {withdrawingId === reservation.id ? (
-                                      <Spinner
-                                        animation="border"
-                                        size="sm"
-                                        style={{ marginRight: "0.5rem" }}
-                                      />
-                                    ) : (
-                                      <i className="bi bi-x-circle me-1" />
-                                    )}
-                                    Withdraw
-                                  </Button>
+                                    {reservation.status}
+                                  </Badge>
+                                  {reservation.status === "PENDING" && (
+                                    <Button
+                                      variant="warning"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleWithdraw(reservation.id)
+                                      }
+                                      disabled={
+                                        withdrawingId === reservation.id
+                                      }
+                                      style={{
+                                        padding: "0.5rem 1rem",
+                                        fontSize: "0.8rem",
+                                        fontWeight: "600",
+                                        borderRadius: "20px",
+                                        border: "none",
+                                        background:
+                                          "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                                        color: "white",
+                                        boxShadow:
+                                          "0 2px 4px rgba(245, 158, 11, 0.2)",
+                                      }}
+                                    >
+                                      {withdrawingId === reservation.id ? (
+                                        <Spinner
+                                          animation="border"
+                                          size="sm"
+                                          style={{ marginRight: "0.5rem" }}
+                                        />
+                                      ) : (
+                                        <i className="bi bi-x-circle me-1" />
+                                      )}
+                                      Withdraw
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="d-flex flex-wrap gap-3 mt-2">
+                                {reservation.reservationDate && (
+                                  <span
+                                    style={{
+                                      fontSize: "0.8rem",
+                                      color: "#64748b",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <i
+                                      className="bi bi-calendar3 me-1"
+                                      style={{ color: "#94a3b8" }}
+                                    />
+                                    Reserved:{" "}
+                                    {new Date(
+                                      reservation.reservationDate
+                                    ).toLocaleDateString()}
+                                  </span>
+                                )}
+                                {reservation.preferredVisitDate && (
+                                  <span
+                                    style={{
+                                      fontSize: "0.8rem",
+                                      color: "#64748b",
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <i
+                                      className="bi bi-calendar-check me-1"
+                                      style={{ color: "#94a3b8" }}
+                                    />
+                                    Visit:{" "}
+                                    {new Date(
+                                      reservation.preferredVisitDate
+                                    ).toLocaleDateString()}
+                                  </span>
                                 )}
                               </div>
                             </div>
-
-                            <div className="d-flex flex-wrap gap-3 mt-2">
-                              {reservation.reservationDate && (
-                                <span
-                                  style={{
-                                    fontSize: "0.8rem",
-                                    color: "#64748b",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <i
-                                    className="bi bi-calendar3 me-1"
-                                    style={{ color: "#94a3b8" }}
-                                  />
-                                  Reserved:{" "}
-                                  {new Date(
-                                    reservation.reservationDate
-                                  ).toLocaleDateString()}
-                                </span>
-                              )}
-                              {reservation.preferredVisitDate && (
-                                <span
-                                  style={{
-                                    fontSize: "0.8rem",
-                                    color: "#64748b",
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <i
-                                    className="bi bi-calendar-check me-1"
-                                    style={{ color: "#94a3b8" }}
-                                  />
-                                  Visit:{" "}
-                                  {new Date(
-                                    reservation.preferredVisitDate
-                                  ).toLocaleDateString()}
-                                </span>
-                              )}
-                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <div

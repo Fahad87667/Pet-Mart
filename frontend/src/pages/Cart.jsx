@@ -81,7 +81,11 @@ function Cart({ onAddToCartSuccess }) {
   const handleRemoveItem = async (productCode) => {
     try {
       const updatedCart = await cartService.removeFromCart(productCode);
-      setCart(updatedCart);
+      setCart(
+        updatedCart && updatedCart.cartLines && updatedCart.cartLines.length > 0
+          ? updatedCart
+          : { cartLines: [], quantityTotal: 0, amountTotal: 0 }
+      );
       if (onAddToCartSuccess) {
         onAddToCartSuccess(updatedCart);
       }

@@ -38,10 +38,10 @@ function Checkout({ onAddToCartSuccess }) {
       try {
         const userData = await getCurrentUser();
         if (userData) {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             fullName: `${userData.firstName} ${userData.lastName}`.trim(),
-            email: userData.email
+            email: userData.email,
           }));
         }
       } catch (error) {
@@ -66,7 +66,8 @@ function Checkout({ onAddToCartSuccess }) {
       newErrors.fullName = "Full name is required";
       isValid = false;
     } else if (!/^[a-zA-Z\s]{2,50}$/.test(formData.fullName)) {
-      newErrors.fullName = "Name must be 2-50 characters and contain only letters and spaces";
+      newErrors.fullName =
+        "Name must be 2-50 characters and contain only letters and spaces";
       isValid = false;
     }
 
@@ -74,7 +75,9 @@ function Checkout({ onAddToCartSuccess }) {
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
       isValid = false;
-    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)
+    ) {
       newErrors.email = "Please enter a valid email address";
       isValid = false;
     } else if (formData.email.length > 100) {
@@ -86,8 +89,8 @@ function Checkout({ onAddToCartSuccess }) {
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required";
       isValid = false;
-    } else if (!/^[8-9]\d{9}$/.test(formData.phone)) {
-      newErrors.phone = "Phone must be 10 digits starting with 8 or 9";
+    } else if (!/^[789]\d{9}$/.test(formData.phone)) {
+      newErrors.phone = "Phone must be 10 digits starting with 7, 8 or 9";
       isValid = false;
     }
 
@@ -99,7 +102,7 @@ function Checkout({ onAddToCartSuccess }) {
       const selectedDate = new Date(formData.preferredDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (selectedDate < today) {
         newErrors.preferredDate = "Please select a future date";
         isValid = false;
@@ -132,14 +135,14 @@ function Checkout({ onAddToCartSuccess }) {
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: null
+        [name]: null,
       });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       setValidated(true);
       return;
@@ -318,10 +321,10 @@ function Checkout({ onAddToCartSuccess }) {
                       minLength={2}
                       maxLength={50}
                       readOnly
-                      style={{ 
+                      style={{
                         borderRadius: "10px",
                         borderColor: errors.fullName ? "#dc3545" : undefined,
-                        backgroundColor: "#f8f9fa"
+                        backgroundColor: "#f8f9fa",
                       }}
                     />
                     <Form.Control.Feedback type="invalid">
@@ -344,10 +347,10 @@ function Checkout({ onAddToCartSuccess }) {
                       placeholder="your@email.com"
                       maxLength={100}
                       readOnly
-                      style={{ 
+                      style={{
                         borderRadius: "10px",
                         borderColor: errors.email ? "#dc3545" : undefined,
-                        backgroundColor: "#f8f9fa"
+                        backgroundColor: "#f8f9fa",
                       }}
                     />
                     <Form.Control.Feedback type="invalid">
@@ -366,9 +369,9 @@ function Checkout({ onAddToCartSuccess }) {
                       onChange={handleInputChange}
                       placeholder="8XXXXXXXXX or 9XXXXXXXXX"
                       pattern="[89]\d{9}"
-                      style={{ 
+                      style={{
                         borderRadius: "10px",
-                        borderColor: errors.phone ? "#dc3545" : undefined
+                        borderColor: errors.phone ? "#dc3545" : undefined,
                       }}
                     />
                     <Form.Control.Feedback type="invalid">
@@ -387,9 +390,9 @@ function Checkout({ onAddToCartSuccess }) {
                   value={formData.preferredDate}
                   onChange={handleInputChange}
                   min={new Date().toISOString().split("T")[0]}
-                  style={{ 
+                  style={{
                     borderRadius: "10px",
-                    borderColor: errors.preferredDate ? "#dc3545" : undefined
+                    borderColor: errors.preferredDate ? "#dc3545" : undefined,
                   }}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -407,9 +410,9 @@ function Checkout({ onAddToCartSuccess }) {
                   onChange={handleInputChange}
                   placeholder="Tell us anything else you'd like us to know... (max 500 characters)"
                   maxLength={500}
-                  style={{ 
+                  style={{
                     borderRadius: "10px",
-                    borderColor: errors.message ? "#dc3545" : undefined
+                    borderColor: errors.message ? "#dc3545" : undefined,
                   }}
                 />
                 {errors.message && (
@@ -435,7 +438,9 @@ function Checkout({ onAddToCartSuccess }) {
                   checked={formData.agreeToTerms}
                   onChange={handleInputChange}
                   label="I understand this is a reservation request and agree to be contacted"
-                  feedback={errors.agreeToTerms || "You must agree before submitting."}
+                  feedback={
+                    errors.agreeToTerms || "You must agree before submitting."
+                  }
                   feedbackType="invalid"
                   isInvalid={!!errors.agreeToTerms}
                 />
