@@ -72,9 +72,19 @@ function Admin({ isAdmin, isLoggedIn }) {
     setResLoading(true);
     try {
       await api.put(`/admin/reservations/${id}/status`, { status });
-      toast.success(`Reservation ${status.toLowerCase()} successfully!`, {
-        autoClose: 1000,
-      });
+      if (status === "ACCEPTED") {
+        toast.success("Reservation accepted!.", {
+          autoClose: 2000,
+        });
+      } else if (status === "REJECTED") {
+        toast.info("Reservation rejected.", {
+          autoClose: 2000,
+        });
+      } else {
+        toast.success(`Reservation ${status.toLowerCase()} successfully!`, {
+          autoClose: 1000,
+        });
+      }
       fetchReservations();
     } catch (err) {
       toast.error(
@@ -153,11 +163,11 @@ function Admin({ isAdmin, isLoggedIn }) {
         // First sort by status (PENDING first)
         if (a.status === "PENDING" && b.status !== "PENDING") return -1;
         if (a.status !== "PENDING" && b.status === "PENDING") return 1;
-        
+
         // Then sort by date (newest first)
         return new Date(b.reservationDate) - new Date(a.reservationDate);
       });
-      
+
       setReservations(sortedReservations || []);
       setResError(null);
     } catch (err) {
@@ -269,7 +279,7 @@ function Admin({ isAdmin, isLoggedIn }) {
   const getStatusBadgeColor = (status) => {
     const colors = {
       available: "#28a745",
-      adopted: "#6c757d",
+      adopted: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
       pending: "#ffc107",
     };
     return colors[status] || "#007bff";
@@ -459,9 +469,19 @@ function Admin({ isAdmin, isLoggedIn }) {
                               style={{
                                 background: getStatusBadgeColor(pet.status),
                                 color: "white",
+                                fontWeight: 700,
+                                fontSize: "0.95rem",
+                                letterSpacing: 1,
                               }}
                             >
-                              {pet.status}
+                              {pet.status === "adopted"
+                                ? "Adopted"
+                                : pet.status === "available"
+                                ? "Available"
+                                : pet.status === "pending"
+                                ? "Pending"
+                                : pet.status.charAt(0).toUpperCase() +
+                                  pet.status.slice(1)}
                             </Badge>
                           </td>
                           <td>
@@ -502,14 +522,23 @@ function Admin({ isAdmin, isLoggedIn }) {
 
                 <div className="table-responsive">
                   {reservations.length > 0 ? (
-                    <div style={{ 
-                      maxHeight: "600px", 
-                      overflowY: "auto",
-                      border: "1px solid #e9ecef",
-                      borderRadius: "8px"
-                    }}>
+                    <div
+                      style={{
+                        maxHeight: "600px",
+                        overflowY: "auto",
+                        border: "1px solid #e9ecef",
+                        borderRadius: "8px",
+                      }}
+                    >
                       <Table hover className="reservation-table">
-                        <thead style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "#f8f9fa" }}>
+                        <thead
+                          style={{
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1,
+                            backgroundColor: "#f8f9fa",
+                          }}
+                        >
                           <tr>
                             <th>Reservation Details</th>
                             <th>Customer Information</th>
