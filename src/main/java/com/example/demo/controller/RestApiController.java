@@ -1,14 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Order;
-import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.Reservation;
 import com.example.demo.model.CartInfo;
 import com.example.demo.model.CartLineInfo;
 import com.example.demo.model.CustomerInfo;
 import com.example.demo.model.ProductInfo;
-import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.service.CartService;
 import com.example.demo.service.ReservationService;
@@ -36,9 +33,6 @@ import org.slf4j.LoggerFactory;
 public class RestApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(RestApiController.class);
-
-    @Autowired
-    private OrderRepository orderRepository;
 
     @Autowired
     private ProductRepository productRepository;

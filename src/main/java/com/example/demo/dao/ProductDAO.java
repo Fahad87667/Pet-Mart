@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -18,8 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.demo.entity.OrderDetail;
-import java.util.List;
 
 @Transactional
 @Repository
@@ -106,29 +105,19 @@ public class ProductDAO {
             throw new IllegalArgumentException("No product found with code: " + code);
         }
         
-            // Check if product is in any orders
-        String checkOrderSql = "Select count(od) from " + OrderDetail.class.getName() + " od Where od.productCode =:code";
-            Query checkOrderQuery = entityManager.createQuery(checkOrderSql);
-            checkOrderQuery.setParameter("code", code);
-            Long orderCount = (Long) checkOrderQuery.getSingleResult();
-            
-            if (orderCount > 0) {
-                throw new RuntimeException("Cannot delete product because it is associated with existing orders.");
-            }
-            
-            // Delete image file if exists
-            if (product.getImagePath() != null) {
-                try {
-                    String fileName = product.getImagePath().substring(product.getImagePath().lastIndexOf("/") + 1);
-                    Path filePath = Paths.get(UPLOAD_DIR, fileName);
+        // Delete image file if exists
+        if (product.getImagePath() != null) {
+            try {
+                String fileName = product.getImagePath().substring(product.getImagePath().lastIndexOf("/") + 1);
+                Path filePath = Paths.get(UPLOAD_DIR, fileName);
                 Files.deleteIfExists(filePath);
-                } catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException("Failed to delete product image: " + e.getMessage(), e);
-                }
             }
-            
-                entityManager.remove(product);
-                entityManager.flush();
+        }
+        
+        entityManager.remove(product);
+        entityManager.flush();
     }
 
     private String getFileExtension(String fileName) {

@@ -7,15 +7,12 @@ import java.util.Set;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
-import com.example.demo.entity.Order;
-import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.Customer;
 import com.example.demo.model.CartInfo;
 import com.example.demo.model.CartLineInfo;
 import com.example.demo.model.CustomerInfo;
 import com.example.demo.model.ProductInfo;
-import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.service.CartService;
 
@@ -33,9 +30,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @Transactional
 public class MainController {
-
-    @Autowired
-    private OrderRepository orderRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -151,48 +145,6 @@ public class MainController {
         }
         model.addAttribute("cartInfo", cartInfo);
         return "shoppingCartConfirmation";
-    }
-
-    @RequestMapping(value = { "/shoppingCartConfirmation" }, method = RequestMethod.POST)
-    public String shoppingCartConfirmationSave(HttpServletRequest request, Model model) {
-        CartInfo cartInfo = cartService.getCartInSession(request);
-        if (cartInfo.isEmpty()) {
-            return "redirect:/shoppingCart";
-        } else if (!cartInfo.isValidCustomer()) {
-            return "redirect:/shoppingCartCustomer";
-        }
-        try {
-            CustomerInfo customerInfo = cartInfo.getCustomerInfo();
-            Order order = new Order();
-            order.setOrderDate(new Date());
-            order.setOrderNum(cartInfo.getOrderNum());
-            order.setAmount(cartInfo.getAmountTotal());
-            order.setCustomerName(customerInfo.getName());
-            order.setCustomerAddress(customerInfo.getAddress());
-            order.setCustomerEmail(customerInfo.getEmail());
-            order.setCustomerPhone(customerInfo.getPhone());
-
-            Set<OrderDetail> orderDetails = new HashSet<>();
-            for (CartLineInfo line : cartInfo.getCartLines()) {
-                ProductInfo productInfo = line.getProductInfo();
-                OrderDetail orderDetail = new OrderDetail();
-                orderDetail.setOrder(order);
-                orderDetail.setProductCode(productInfo.getCode());
-                orderDetail.setProductName(productInfo.getName());
-                orderDetail.setQuanity(line.getQuantity());
-                orderDetail.setPrice(productInfo.getPrice());
-                orderDetail.setAmount(line.getAmount());
-                orderDetails.add(orderDetail);
-            }
-            order.setOrderDetails(orderDetails);
-            orderRepository.save(order);
-        } catch (Exception e) {
-            return "shoppingCartConfirmation";
-        }
-
-        cartService.removeCartInSession(request);
-        cartService.storeLastOrderedCartInSession(request, cartInfo);
-        return "redirect:/shoppingCartFinalize";
     }
 
     @RequestMapping(value = { "/shoppingCartFinalize" }, method = RequestMethod.GET)
