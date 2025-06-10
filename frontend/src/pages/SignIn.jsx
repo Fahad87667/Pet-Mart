@@ -319,14 +319,14 @@ function SignIn({ updateAuthState }) {
                   marginBottom: "1.5rem",
                 }}
               >
-                <Form.Check
+                {/* <Form.Check
                   type="checkbox"
                   id="rememberMe"
                   label="Remember me"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   style={{ fontSize: "0.9rem", color: "#4a5568" }}
-                />
+                /> */}
                 {/* <Link
                   to="/forgot-password"
                   style={{
