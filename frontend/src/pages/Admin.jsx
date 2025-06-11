@@ -86,6 +86,7 @@ function Admin({ isAdmin, isLoggedIn }) {
         });
       }
       fetchReservations();
+      fetchPets();
     } catch (err) {
       toast.error(
         `Failed to update status: ${
@@ -247,7 +248,7 @@ function Admin({ isAdmin, isLoggedIn }) {
       description: pet.description ?? "",
       price: pet.price ?? 0,
       image: pet.imagePath ?? "",
-      status: pet.status ?? "available",
+      status: pet.status ? pet.status.toLowerCase() : "available",
       fileData: null,
     });
     setShowEditModal(true);
@@ -467,21 +468,16 @@ function Admin({ isAdmin, isLoggedIn }) {
                               pill
                               bg=""
                               style={{
-                                background: getStatusBadgeColor(pet.status),
+                                background: getStatusBadgeColor(
+                                  (pet.status || "").toLowerCase()
+                                ),
                                 color: "white",
                                 fontWeight: 700,
                                 fontSize: "0.95rem",
                                 letterSpacing: 1,
                               }}
                             >
-                              {pet.status === "adopted"
-                                ? "Adopted"
-                                : pet.status === "available"
-                                ? "Available"
-                                : pet.status === "pending"
-                                ? "Pending"
-                                : pet.status.charAt(0).toUpperCase() +
-                                  pet.status.slice(1)}
+                              {(pet.status || "").toUpperCase()}
                             </Badge>
                           </td>
                           <td>

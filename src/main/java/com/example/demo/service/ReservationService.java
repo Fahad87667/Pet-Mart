@@ -2,9 +2,11 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Reservation;
 import com.example.demo.entity.Reservation.ReservationStatus;
+import com.example.demo.entity.Product;
 import com.example.demo.model.CartInfo;
 import com.example.demo.model.CustomerInfo;
 import com.example.demo.repository.ReservationRepository;
+import com.example.demo.repository.ProductRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class ReservationService {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,6 +56,13 @@ public class ReservationService {
         // Store cart items details as JSON string
         String reservedItemsDetails = objectMapper.writeValueAsString(cartInfo.getCartLines());
         reservation.setReservedItemsDetails(reservedItemsDetails);
+
+        // Set the product on the reservation (assume one pet per reservation)
+        if (!cartInfo.getCartLines().isEmpty()) {
+            String productCode = cartInfo.getCartLines().get(0).getProductInfo().getCode();
+            Product product = productRepository.findById(productCode).orElse(null);
+            reservation.setProduct(product);
+        }
 
         return reservationRepository.save(reservation);
     }

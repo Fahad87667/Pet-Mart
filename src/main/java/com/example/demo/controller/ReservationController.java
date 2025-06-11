@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,19 +75,27 @@ public class ReservationController {
             logger.info("Successfully updated reservation status to: {}", updatedReservation.getStatus());
 
             // Update product status based on reservation status
-            Product product = reservation.getProduct();
-            if (product != null) {
-                String oldProductStatus = product.getStatus();
-                if ("ACCEPTED".equalsIgnoreCase(newStatus)) {
-                    product.setStatus("ADOPTED");
-                } else if ("REJECTED".equalsIgnoreCase(newStatus)) {
-                    product.setStatus("AVAILABLE");
+            // Update ALL pets in reservedItemsDetails
+            String reservedItemsDetails = reservation.getReservedItemsDetails();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                JsonNode items = objectMapper.readTree(reservedItemsDetails);
+                for (JsonNode item : items) {
+                    String productCode = item.get("productInfo").get("code").asText();
+                    Product pet = productRepository.findById(productCode).orElse(null);
+                    if (pet != null) {
+                        String oldProductStatus = pet.getStatus();
+                        if ("ACCEPTED".equalsIgnoreCase(newStatus)) {
+                            pet.setStatus("ADOPTED");
+                        } else if ("REJECTED".equalsIgnoreCase(newStatus)) {
+                            pet.setStatus("AVAILABLE");
+                        }
+                        Product updatedProduct = productRepository.save(pet);
+                        logger.info("Updated product status from {} to {} for product code: {}", oldProductStatus, updatedProduct.getStatus(), updatedProduct.getCode());
+                    }
                 }
-                Product updatedProduct = productRepository.save(product);
-                logger.info("Updated product status from {} to {} for product code: {}", 
-                    oldProductStatus, updatedProduct.getStatus(), updatedProduct.getCode());
-            } else {
-                logger.warn("No product associated with reservation ID: {}", id);
+            } catch (Exception e) {
+                logger.error("Error updating product statuses for reservation ID {}: {}", id, e.getMessage());
             }
 
             Map<String, Object> response = new HashMap<>();

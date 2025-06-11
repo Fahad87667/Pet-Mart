@@ -440,6 +440,7 @@ public class ApiController {
             existingProduct.setGender(gender);
             existingProduct.setDescription(description);
             existingProduct.setPrice(price);
+            // Allow status to be updated to any value by admin
             existingProduct.setStatus(status);
             // Preserve createDate
 
